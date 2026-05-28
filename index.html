@@ -31,6 +31,8 @@ body{
     background-size:cover;
     background-position:center;
     transition:0.3s;
+    transition: background 0.8s,
+            color 0.8s;
 }
 
 .keyboard-container{
@@ -47,6 +49,9 @@ body{
     gap:10px;
     margin-bottom:15px;
     flex-wrap:wrap;
+    <button onclick="toggleAutoTheme()">
+AUTO RGB
+</button>
 }
 
 .top-bar button,
@@ -94,6 +99,9 @@ textarea{
     cursor:pointer;
     transition:0.15s;
     box-shadow:0 0 10px #00000040;
+    transition: 0.3s,
+            background 0.8s,
+            color 0.8s;
 }
 
 .key:hover{
@@ -186,7 +194,15 @@ const bgUpload = document.getElementById('bgUpload');
 
 let isCaps = false;
 let emojiMode = false;
+let autoTheme = false;
+let autoThemeInterval = null;
 
+const themeList = [
+    'dark',
+    'blue',
+    'red',
+    'green'
+];
 const keys = [
     ['q','w','e','r','t','y','u','i','o','p'],
     ['a','s','d','f','g','h','j','k','l'],
@@ -365,7 +381,35 @@ function applyTheme(name){
 
     localStorage.setItem('theme',name);
 }
+function toggleAutoTheme(){
 
+    autoTheme = !autoTheme;
+
+    if(autoTheme){
+
+        let index = 0;
+
+        autoThemeInterval = setInterval(()=>{
+
+            applyTheme(themeList[index]);
+
+            themeSelector.value =
+                themeList[index];
+
+            index++;
+
+            if(index >= themeList.length){
+                index = 0;
+            }
+
+        },2000);
+
+    } else {
+
+        clearInterval(autoThemeInterval);
+
+    }
+}
 themeSelector.addEventListener('change',()=>{
     applyTheme(themeSelector.value);
 });
