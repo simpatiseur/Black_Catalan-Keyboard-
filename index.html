@@ -207,7 +207,7 @@ let holdDelete;
 
 const savedWords=JSON.parse(localStorage.getItem('words')||'[]');
 
-const dictionary={
+const dictionaryTranslate={
 bonjour:'hello',
 merci:'thanks',
 maison:'house',
@@ -322,14 +322,11 @@ showSuggestions();
 }
 
 function stopDeleting(){
-
 clearInterval(holdDelete);
-
 }
 
 back.addEventListener('mousedown',startDeleting);
 back.addEventListener('touchstart',startDeleting);
-
 back.addEventListener('mouseup',stopDeleting);
 back.addEventListener('mouseleave',stopDeleting);
 back.addEventListener('touchend',stopDeleting);
@@ -351,11 +348,8 @@ btn.textContent=text;
 btn.onclick=()=>{
 
 requestAnimationFrame(()=>{
-
 insertText(text);
-
 vibrate();
-
 });
 
 };
@@ -442,12 +436,9 @@ suggestions.innerHTML='';
 
 let words=output.value.split(' ');
 
-let current=
-words[words.length-1]
-.toLowerCase();
+let current=words[words.length-1].toLowerCase();
 
 const dictionary=[
-
 'bonjour',
 'salut',
 'merci',
@@ -471,57 +462,34 @@ const dictionary=[
 'français',
 'ia',
 'intelligence',
-'clavier',
 'emoji',
 'background'
-
 ];
 
 let prediction=[
-
 ...new Set([
 ...dictionary,
 ...savedWords
 ])
-
 ];
 
 prediction
 .filter(w=>
-
-w.toLowerCase()
-.startsWith(current)
-
+w.toLowerCase().startsWith(current)
 && current.length>0
-
 )
-
 .slice(0,8)
-
 .forEach(word=>{
 
 let div=document.createElement('div');
-
 div.className='suggestion';
-
 div.textContent=word;
 
 div.onclick=()=>{
-
 words[words.length-1]=word;
-
-output.value=
-words.join(' ')+' ';
-
+output.value=words.join(' ')+' ';
 showSuggestions();
-
 };
-
-suggestions.appendChild(div);
-
-});
-
-}
 
 suggestions.appendChild(div);
 
@@ -534,58 +502,39 @@ function translateWord(){
 let words=output.value.trim().split(' ');
 let last=words[words.length-1].toLowerCase();
 
-if(dictionary[last]){
-
-output.value+=' → '+dictionary[last];
-
+if(dictionaryTranslate[last]){
+output.value+=' → '+dictionaryTranslate[last];
 }else{
-
 output.value+=' → ?';
-
 }
 
 }
 
 function backspace(){
-
 output.value=output.value.slice(0,-1);
-
+showSuggestions();
 }
 
 function toggleCaps(){
-
 caps=!caps;
 buildKeyboard();
-
 }
 
 function toggleLayout(){
-
-layout=
-layout==='qwerty'
-?'azerty'
-:'qwerty';
-
+layout=layout==='qwerty'?'azerty':'qwerty';
 buildKeyboard();
-
 }
 
 function toggleEmoji(){
-
 emojiMode=!emojiMode;
 numberMode=false;
-
 buildKeyboard();
-
 }
 
 function toggleNumbers(){
-
 numberMode=!numberMode;
 emojiMode=false;
-
 buildKeyboard();
-
 }
 
 function moveCursor(direction){
@@ -602,7 +551,6 @@ pos=Math.min(output.value.length,pos+1);
 
 output.selectionStart=pos;
 output.selectionEnd=pos;
-
 output.focus();
 
 }
@@ -662,10 +610,7 @@ if(file){
 const reader=new FileReader();
 
 reader.onload=function(ev){
-
-document.body.style.backgroundImage=
-`url(${ev.target.result})`;
-
+document.body.style.backgroundImage=`url(${ev.target.result})`;
 }
 
 reader.readAsDataURL(file);
@@ -677,7 +622,6 @@ reader.readAsDataURL(file);
 function copyText(){
 
 navigator.clipboard.writeText(output.value);
-
 alert('Texte copié');
 
 }
@@ -689,22 +633,16 @@ window.SpeechRecognition||
 window.webkitSpeechRecognition;
 
 if(!SpeechRecognition){
-
 alert('Micro non supporté');
-
 return;
-
 }
 
 const recognition=new SpeechRecognition();
-
 recognition.lang='fr-FR';
 
 recognition.onresult=function(event){
-
-output.value+=' '+
-event.results[0][0].transcript;
-
+output.value+=' '+event.results[0][0].transcript;
+showSuggestions();
 };
 
 recognition.start();
@@ -714,27 +652,20 @@ recognition.start();
 function fakeAI(){
 
 if(output.value.includes('bonjour')){
-
 output.value+='\n🤖 Bonjour 👋';
-
 }else{
-
 output.value+='\n🤖 IA activée';
+}
 
 }
 
+function vibrate(){
+if(navigator.vibrate){
+navigator.vibrate(18);
+}
 }
 
 buildKeyboard();
-  function vibrate(){
-
-if(navigator.vibrate){
-
-navigator.vibrate(18);
-
-}
-
-  }
 
 </script>
 
