@@ -96,14 +96,17 @@ gap:8px;
 
 .row{
 display:flex;
-gap:6px;
-overflow-x:auto;
-padding-bottom:4px;
+gap:5px;
+justify-content:center;
+flex-wrap:nowrap;
 }
+  .emoji-row{
+overflow-x:auto;
+  }
 
 .key{
 flex:1;
-min-width:48px;
+min-width:34px;
 padding:14px;
 border:none;
 border-radius:14px;
@@ -228,12 +231,17 @@ const letters=[
 ];
 
 const numbers=[
-['1','2','3','4','5','6','7','8','9','0'],
-['!','@','#','$','%','^','&','*','(',')'],
-['-','_','=','+','[',']','{','}','|','\\'],
-[';',':',"'",'"',',','.','/','?','`','~'],
-['€','£','¥','₩','÷','×','°','•','○','●'],
-['♤','♡','◇','♧','■','□','¤','¿','¡','☆']
+
+['1','2','3','4','5','6','7','8'],
+
+['9','0','!','@','#','$','%','&'],
+
+['*','(',')','-','_','=','+','/'],
+
+['?',';',':','€','£','¥','₩','÷'],
+
+['×','°','•','○','●','♤','♡','◇']
+
 ];
 
 const emojis=[
@@ -274,7 +282,7 @@ const current=numberMode?numbers:letters;
 current.forEach(r=>{
 
 let row=document.createElement('div');
-row.className='row';
+row.className='row emoji-row';
 
 r.forEach(k=>{
 
