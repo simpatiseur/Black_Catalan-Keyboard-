@@ -266,14 +266,25 @@ keyboard.innerHTML='';
 
 if(emojiMode){
 
+if(emojiMode){
+
+for(let i=0;i<emojis.length;i+=8){
+
 let row=document.createElement('div');
+
 row.className='row';
 
-emojis.forEach(e=>{
+let slice=emojis.slice(i,i+8);
+
+slice.forEach(e=>{
+
 row.appendChild(createKey(e));
+
 });
 
 keyboard.appendChild(row);
+
+}
 
 }else{
 
