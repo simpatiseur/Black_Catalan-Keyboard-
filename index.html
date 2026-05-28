@@ -344,14 +344,16 @@ keyboard.appendChild(last);
 
 function createKey(text){
 
-let btn=document.createElement('button');
-btn.className='key';
-btn.textContent=text;
-
 btn.onclick=()=>{
+
 requestAnimationFrame(()=>{
+
 insertText(text);
+
+vibrate();
+
 });
+
 };
 
 return btn;
@@ -435,32 +437,79 @@ function showSuggestions(){
 suggestions.innerHTML='';
 
 let words=output.value.split(' ');
-let current=words[words.length-1].toLowerCase();
 
-let prediction=[
-...savedWords,
+let current=
+words[words.length-1]
+.toLowerCase();
+
+const dictionary=[
+
 'bonjour',
+'salut',
 'merci',
-'hello',
+'maison',
+'ordinateur',
+'clavier',
 'android',
 'gaming',
-'keyboard'
+'hello',
+'keyboard',
+'developer',
+'javascript',
+'html',
+'css',
+'chatgpt',
+'openai',
+'google',
+'gboard',
+'france',
+'anglais',
+'français',
+'ia',
+'intelligence',
+'clavier',
+'emoji',
+'background'
+
+];
+
+let prediction=[
+
+...new Set([
+...dictionary,
+...savedWords
+])
+
 ];
 
 prediction
-.filter(w=>w.toLowerCase().startsWith(current))
-.slice(0,6)
+.filter(w=>
+
+w.toLowerCase()
+.startsWith(current)
+
+&& current.length>0
+
+)
+
+.slice(0,8)
+
 .forEach(word=>{
 
 let div=document.createElement('div');
 
 div.className='suggestion';
+
 div.textContent=word;
 
 div.onclick=()=>{
 
 words[words.length-1]=word;
-output.value=words.join(' ')+' ';
+
+output.value=
+words.join(' ')+' ';
+
+showSuggestions();
 
 };
 
@@ -469,6 +518,7 @@ suggestions.appendChild(div);
 });
 
 }
+
 
 function translateWord(){
 
