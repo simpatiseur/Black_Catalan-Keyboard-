@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ali Keyboard AI Ultimate</title>
+
+<style>
+:root{
+--bg:#121212;
+--key:#1f1f1f;
+--accent:#00ffff;
+--text:#ffffff;
+}
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
+-webkit-tap-highlight-color:transparent;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+padding:10px;
+transition:.5s;
+overflow-x:hidden;
+background-size:cover;
+background-position:center;
+}
+
+.container{
+max-width:950px;
+margin:auto;
+background:rgba(0,0,0,.4);
+padding:15px;
+border-radius:25px;
+backdrop-filter:blur(12px);
+}
+
+.topbar{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-bottom:10px;
+}
+
+.topbar button,
+.topbar select,
+.topbar input{
+padding:10px;
+border:none;
+border-radius:12px;
+background:var(--key);
+color:white;
+}
+
+textarea{
+width:100%;
+height:150px;
+border:none;
+outline:none;
+border-radius:18px;
+padding:15px;
+font-size:18px;
+background:#ffffff10;
+color:white;
+resize:none;
+margin-bottom:10px;
+}
+
+.suggestions{
+display:flex;
+overflow-x:auto;
+gap:8px;
+margin-bottom:10px;
+}
+
+.suggestion{
+padding:8px 12px;
+background:var(--accent);
+color:black;
+border-radius:12px;
+font-weight:bold;
+white-space:nowrap;
+cursor:pointer;
+}
+
+.keyboard{
+display:flex;
+flex-direction:column;
+gap:6px;
+}
+
+.row{
+display:flex;
+gap:5px;
+justify-content:center;
+}
+
+.key{
+flex:1;
+min-width:35px;
+padding:13px;
+border:none;
+border-radius:14px;
+background:var(--key);
+color:white;
+font-size:16px;
+transition:transform .08s;
+}
+
+.key:active{
+transform:scale(.92);
+}
+
+.special{
+background:var(--accent);
+color:black;
+font-weight:bold;
+}
+
+.arrow-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:8px;
+width:220px;
+margin:auto;
+margin-top:12px;
+}
+
+.arrow-grid button{
+padding:14px;
+border:none;
+border-radius:14px;
+background:var(--key);
+color:white;
+font-size:18px;
+}
+
+.hidden{
+visibility:hidden;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topbar">
+
+<select id="themeSelector">
+<option value="dark">Dark</option>
+<option value="blue">Blue</option>
+<option value="red">Red Fire</option>
+<option value="green">Matrix</option>
+</select>
+
+<button onclick="toggleLayout()">AZERTY</button>
+<button onclick="toggleCaps()">CAPS</button>
+<button onclick="toggleEmoji()">😀</button>
+<button onclick="toggleNumbers()">123</button>
+<button onclick="toggleRGB()">RGB</button>
+<button onclick="copyText()">📋</button>
+<button onclick="translateWord()">🌍</button>
+<button onclick="startVoice()">🎤</button>
+<button onclick="fakeAI()">🤖</button>
+
+<input type="file" id="bgUpload" accept="image/*">
+
+</div>
+
+<textarea id="output" placeholder="Tape ici..."></textarea>
+
+<div class="suggestions" id="suggestions"></div>
+
+<div class="keyboard" id="keyboard"></div>
+
+<div class="arrow-grid">
+<button class="hidden"></button>
+<button onclick="moveCursor('up')">▲</button>
+<button class="hidden"></button>
+
+<button onclick="moveCursor('left')">◀</button>
+<button onclick="moveCursor('down')">▼</button>
+<button onclick="moveCursor('right')">▶</button>
+</div>
+
+</div>
+
+<script>
+
+const output=document.getElementById('output');
+const keyboard=document.getElementById('keyboard');
+const suggestions=document.getElementById('suggestions');
+
+let caps=false;
+let emojiMode=false;
+let numberMode=false;
+let layout='qwerty';
+let rgb=false;
+let rgbInterval;
+let holdDelete;
+
+const savedWords=JSON.parse(localStorage.getItem('words')||'[]');
+
+const dictionary={
+bonjour:'hello',
+merci:'thanks',
+maison:'house',
+clavier:'keyboard',
+ordinateur:'computer',
+salut:'hi'
+};
+
+const qwerty=[
+['q','w','e','r','t','y','u','i','o','p'],
+['a','s','d','f','g','h','j','k','l'],
+['z','x','c','v','b','n','m']
+];
+
+const azerty=[
+['a','z','e','r','t','y','u','i','o','p'],
+['q','s','d','f','g','h','j','k','l','m'],
+['w','x','c','v','b','n']
+];
+
+const symbols=[
+['1','2','3','4','5','6','7','8'],
+['9','0','!','@','#','$','%','&'],
+['*','(',')','-','_','=','+','/'],
+['?',';',':','€','£','¥','₩','÷'],
+['×','°','•','○','●','♤','♡','◇']
+];
+
+const emojis=[
+'😀','😂','🤣','😍','❤️','🔥','😭','😎',
+'🎮','✨','💯','🤖','👍','🙏','🎉','🚀',
+'⚡','👀','💀','🥵','😈','👑','💎','🌈',
+'🎵','📱','💻','⌨️','🖤','💜','💙','💚'
+];
+
+const themes={
+dark:{bg:'#121212',key:'#1f1f1f',accent:'#00ffff'},
+blue:{bg:'#001b44',key:'#003399',accent:'#00ffff'},
+red:{bg:'#330000',key:'#880000',accent:'#ff4444'},
+green:{bg:'#001100',key:'#003300',accent:'#00ff88'}
+};
+
+function buildKeyboard(){
+
+keyboard.innerHTML='';
+
+if(emojiMode){
+
+for(let i=0;i<emojis.length;i+=8){
+
+let row=document.createElement('div');
+row.className='row';
+
+emojis.slice(i,i+8).forEach(e=>{
+row.appendChild(createKey(e));
+});
+
+keyboard.appendChild(row);
+
+}
+
+}else{
+
+const current=numberMode
+? symbols
+: (layout==='qwerty'?qwerty:azerty);
+
+current.forEach(r=>{
+
+let row=document.createElement('div');
+row.className='row';
+
+r.forEach(k=>{
+
+let value=caps?k.toUpperCase():k;
+
+row.appendChild(createKey(value));
+
+});
+
+keyboard.appendChild(row);
+
+});
+
+}
+
+let last=document.createElement('div');
+last.className='row';
+
+let back=createSpecial('⌫',backspace);
+let space=createSpecial('SPACE',()=>insertText(' '));
+space.style.flex='4';
+
+let enter=createSpecial('ENTER',()=>insertText('\n'));
+
+function startDeleting(){
+
+clearInterval(holdDelete);
+
+holdDelete=setInterval(()=>{
+
+if(output.value.length>0){
+
+output.value=output.value.slice(0,-1);
+
+showSuggestions();
+
+}
+
+},15);
+
+}
+
+function stopDeleting(){
+
+clearInterval(holdDelete);
+
+}
+
+back.addEventListener('mousedown',startDeleting);
+back.addEventListener('touchstart',startDeleting);
+
+back.addEventListener('mouseup',stopDeleting);
+back.addEventListener('mouseleave',stopDeleting);
+back.addEventListener('touchend',stopDeleting);
+
+last.appendChild(back);
+last.appendChild(space);
+last.appendChild(enter);
+
+keyboard.appendChild(last);
+
+}
+
+function createKey(text){
+
+let btn=document.createElement('button');
+btn.className='key';
+btn.textContent=text;
+
+btn.onclick=()=>{
+requestAnimationFrame(()=>{
+insertText(text);
+});
+};
+
+return btn;
+
+}
+
+function createSpecial(text,action){
+
+let btn=document.createElement('button');
+btn.className='key special';
+btn.textContent=text;
+btn.onclick=action;
+
+return btn;
+
+}
+
+function insertText(text){
+
+const start=output.selectionStart;
+const end=output.selectionEnd;
+
+output.value=
+output.value.substring(0,start)+
+text+
+output.value.substring(end);
+
+output.selectionStart=
+output.selectionEnd=
+start+text.length;
+
+output.focus();
+
+autoCorrect();
+saveWord();
+showSuggestions();
+
+}
+
+function autoCorrect(){
+
+const corrections={
+bonjor:'bonjour',
+merc:'merci',
+helo:'hello',
+keybord:'keyboard'
+};
+
+let words=output.value.split(' ');
+let last=words[words.length-1];
+
+if(corrections[last]){
+
+words[words.length-1]=corrections[last];
+output.value=words.join(' ');
+
+}
+
+}
+
+function saveWord(){
+
+let words=output.value.split(' ');
+let last=words[words.length-1];
+
+if(last.length>2 && !savedWords.includes(last)){
+
+savedWords.push(last);
+
+localStorage.setItem(
+'words',
+JSON.stringify(savedWords)
+);
+
+}
+
+}
+
+function showSuggestions(){
+
+suggestions.innerHTML='';
+
+let words=output.value.split(' ');
+let current=words[words.length-1].toLowerCase();
+
+let prediction=[
+...savedWords,
+'bonjour',
+'merci',
+'hello',
+'android',
+'gaming',
+'keyboard'
+];
+
+prediction
+.filter(w=>w.toLowerCase().startsWith(current))
+.slice(0,6)
+.forEach(word=>{
+
+let div=document.createElement('div');
+
+div.className='suggestion';
+div.textContent=word;
+
+div.onclick=()=>{
+
+words[words.length-1]=word;
+output.value=words.join(' ')+' ';
+
+};
+
+suggestions.appendChild(div);
+
+});
+
+}
+
+function translateWord(){
+
+let words=output.value.trim().split(' ');
+let last=words[words.length-1].toLowerCase();
+
+if(dictionary[last]){
+
+output.value+=' → '+dictionary[last];
+
+}else{
+
+output.value+=' → ?';
+
+}
+
+}
+
+function backspace(){
+
+output.value=output.value.slice(0,-1);
+
+}
+
+function toggleCaps(){
+
+caps=!caps;
+buildKeyboard();
+
+}
+
+function toggleLayout(){
+
+layout=
+layout==='qwerty'
+?'azerty'
+:'qwerty';
+
+buildKeyboard();
+
+}
+
+function toggleEmoji(){
+
+emojiMode=!emojiMode;
+numberMode=false;
+
+buildKeyboard();
+
+}
+
+function toggleNumbers(){
+
+numberMode=!numberMode;
+emojiMode=false;
+
+buildKeyboard();
+
+}
+
+function moveCursor(direction){
+
+let pos=output.selectionStart;
+
+if(direction==='left'){
+pos=Math.max(0,pos-1);
+}
+
+if(direction==='right'){
+pos=Math.min(output.value.length,pos+1);
+}
+
+output.selectionStart=pos;
+output.selectionEnd=pos;
+
+output.focus();
+
+}
+
+function applyTheme(name){
+
+const t=themes[name];
+
+document.documentElement.style.setProperty('--bg',t.bg);
+document.documentElement.style.setProperty('--key',t.key);
+document.documentElement.style.setProperty('--accent',t.accent);
+
+}
+
+document.getElementById('themeSelector')
+.addEventListener('change',(e)=>{
+applyTheme(e.target.value);
+});
+
+function toggleRGB(){
+
+rgb=!rgb;
+
+if(rgb){
+
+let i=0;
+
+rgbInterval=setInterval(()=>{
+
+let names=Object.keys(themes);
+
+applyTheme(names[i]);
+
+i++;
+
+if(i>=names.length){
+i=0;
+}
+
+},1200);
+
+}else{
+
+clearInterval(rgbInterval);
+
+}
+
+}
+
+document.getElementById('bgUpload')
+.addEventListener('change',(e)=>{
+
+const file=e.target.files[0];
+
+if(file){
+
+const reader=new FileReader();
+
+reader.onload=function(ev){
+
+document.body.style.backgroundImage=
+`url(${ev.target.result})`;
+
+}
+
+reader.readAsDataURL(file);
+
+}
+
+});
+
+function copyText(){
+
+navigator.clipboard.writeText(output.value);
+
+alert('Texte copié');
+
+}
+
+function startVoice(){
+
+const SpeechRecognition=
+window.SpeechRecognition||
+window.webkitSpeechRecognition;
+
+if(!SpeechRecognition){
+
+alert('Micro non supporté');
+
+return;
+
+}
+
+const recognition=new SpeechRecognition();
+
+recognition.lang='fr-FR';
+
+recognition.onresult=function(event){
+
+output.value+=' '+
+event.results[0][0].transcript;
+
+};
+
+recognition.start();
+
+}
+
+function fakeAI(){
+
+if(output.value.includes('bonjour')){
+
+output.value+='\n🤖 Bonjour 👋';
+
+}else{
+
+output.value+='\n🤖 IA activée';
+
+}
+
+}
+
+buildKeyboard();
+
+</script>
+
+</body>
+</html>
