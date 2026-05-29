@@ -1001,6 +1001,10 @@ function sendText() {
   // Envoie le texte directement dans le champ actif via le bridge Android
   if (window.AndroidKeyboard) {
     AndroidKeyboard.sendText(text);
+// Simule la touche Entrée pour envoyer
+setTimeout(() => {
+  AndroidKeyboard.sendKey(66); // 66 = KeyEvent.KEYCODE_ENTER
+}, 100);
     showToast('🚀 ENVOYÉ!');
     output.value = '';
     suggestions.innerHTML = '';
