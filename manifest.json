@@ -1,0 +1,36 @@
+{
+  "name": "Ali Keyboard Ultra",
+  "short_name": "ALI KEY",
+  "description": "Clavier futuriste avec thèmes, emojis, IA, voix et effets néon",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#030712",
+  "theme_color": "#00f5ff",
+  "lang": "fr",
+  "scope": "/",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/030712/00f5ff?text=AK",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/030712/00f5ff?text=AK",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Ouvrir le clavier",
+      "short_name": "Clavier",
+      "description": "Lancer Ali Keyboard Ultra",
+      "url": "/index.html"
+    }
+  ]
+}
