@@ -1,0 +1,32 @@
+{
+  "name": "Ali Keyboard Ultra",
+  "short_name": "ALI KEY",
+  "description": "Clavier futuriste avec thèmes, emojis, IA, voix et effets néon",
+  "start_url": "/Black_Catalan-Keyboard-/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#030712",
+  "theme_color": "#00f5ff",
+  "lang": "fr",
+  "scope": "/Black_Catalan-Keyboard-/",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
