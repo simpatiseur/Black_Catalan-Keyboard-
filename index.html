@@ -1010,13 +1010,14 @@ function sendText() {
   setTimeout(() => { ow.style.boxShadow = ''; ow.style.borderColor = ''; }, 600);
 
   // Envoie le texte directement dans le champ actif via le bridge Android
-  if (window.AndroidKeyboard) {
+if (window.AndroidKeyboard) {
+  AndroidKeyboard.performEditorAction();
   AndroidKeyboard.sendKey(66);
   showToast('🚀 ENVOYÉ!');
   output.value = '';
   suggestions.innerHTML = '';
   updateStats();
-  }else {
+}else {
   // Fallback navigateur
   navigator.clipboard.writeText(text)
     .then(() => { showToast('📋 COPIÉ!'); output.value = ''; suggestions.innerHTML = ''; updateStats(); })
