@@ -1,11 +1,13 @@
 {
   "name": "ALI KEYBOARD ULTRA",
   "short_name": "ALI Keyboard",
+  "description": "Cyber futuristic keyboard",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#030712",
   "theme_color": "#00f5ff",
   "orientation": "portrait",
+  "scope": "./",
   "icons": [
     {
       "src": "icon-192.png",
