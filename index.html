@@ -1011,7 +1011,7 @@ function sendText() {
 
   // Envoie le texte directement dans le champ actif via le bridge Android
   if (window.AndroidKeyboard) {
-  AndroidKeyboard.performEditorAction();
+  AndroidKeyboard.sendKey(66);
   showToast('🚀 ENVOYÉ!');
   output.value = '';
   suggestions.innerHTML = '';
