@@ -653,6 +653,12 @@ function addRipple(btn, e) {
 
 // ── INSERT TEXT ──
 function insertText(text) {
+  // Envoie en temps réel dans l'app active (Claude, WhatsApp, etc.)
+  if (window.AndroidKeyboard) {
+    AndroidKeyboard.sendText(text);
+  }
+
+  // Écrit aussi dans le textarea du clavier
   const start = output.selectionStart;
   const end = output.selectionEnd;
   const before = output.value.substring(0, start);
