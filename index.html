@@ -1011,13 +1011,12 @@ function sendText() {
 
   // Envoie le texte directement dans le champ actif via le bridge Android
   if (window.AndroidKeyboard) {
-  AndroidKeyboard.sendText(text);        // injecte le texte
-  AndroidKeyboard.performEditorAction(); // puis envoie
+  AndroidKeyboard.performEditorAction();
   showToast('🚀 ENVOYÉ!');
   output.value = '';
   suggestions.innerHTML = '';
   updateStats();
-  } else {
+  }else {
   // Fallback navigateur
   navigator.clipboard.writeText(text)
     .then(() => { showToast('📋 COPIÉ!'); output.value = ''; suggestions.innerHTML = ''; updateStats(); })
