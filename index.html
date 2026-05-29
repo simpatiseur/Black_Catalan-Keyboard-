@@ -2,22 +2,21 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>ALI KEYBOARD ULTRA</title>
+<title>ALI KEYBOARD PRO</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
   --bg:#030712;
-  --surface:#0d1117;
+  --surface:#0f172a;
   --key:#111827;
-  --border:#1f2937;
   --accent:#00f5ff;
   --accent2:#ff00ff;
-  --text:#e2e8f0;
+  --text:#ffffff;
 }
 
 *{
@@ -29,29 +28,32 @@
 
 body{
   background:var(--bg);
-  color:var(--text);
   font-family:'Share Tech Mono', monospace;
+  color:white;
   min-height:100vh;
-  padding:10px;
+  overflow:hidden;
 }
 
 .wrapper{
-  max-width:900px;
-  margin:auto;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  padding:8px;
+  gap:8px;
 }
 
 .header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:10px;
+  padding:8px;
 }
 
 .logo{
-  font-size:22px;
   font-family:'Orbitron', sans-serif;
-  color:var(--accent);
+  font-size:22px;
   font-weight:900;
+  color:var(--accent);
 }
 
 .status{
@@ -61,9 +63,13 @@ body{
 
 .toolbar{
   display:flex;
-  flex-wrap:wrap;
   gap:6px;
-  margin-bottom:10px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.toolbar::-webkit-scrollbar{
+  display:none;
 }
 
 .tb-btn,
@@ -72,81 +78,82 @@ body{
   outline:none;
   background:var(--key);
   color:white;
-  padding:10px 14px;
-  border-radius:10px;
+  padding:12px 14px;
+  border-radius:14px;
   font-size:14px;
-  cursor:pointer;
+  white-space:nowrap;
 }
 
 .tb-btn:active{
   transform:scale(.95);
 }
 
-.output-wrapper{
+.output-box{
   background:var(--surface);
-  border-radius:14px;
+  border-radius:20px;
   overflow:hidden;
-  margin-bottom:10px;
-  border:1px solid var(--border);
+  border:1px solid #1f2937;
 }
 
 textarea{
   width:100%;
-  min-height:100px;
+  height:120px;
   background:transparent;
   border:none;
   outline:none;
-  color:white;
   resize:none;
-  padding:14px;
-  font-size:20px;
+  color:white;
+  font-size:22px;
+  padding:16px;
   font-family:'Share Tech Mono', monospace;
 }
 
 .keyboard{
+  flex:1;
   display:flex;
   flex-direction:column;
-  gap:5px;
+  justify-content:flex-end;
+  gap:6px;
 }
 
 .row{
   display:flex;
-  gap:5px;
+  gap:6px;
 }
 
 .key{
   flex:1;
-  height:52px;
+  height:62px;
   border:none;
-  border-radius:12px;
+  border-radius:18px;
   background:var(--key);
   color:white;
-  font-size:20px;
-  cursor:pointer;
+  font-size:24px;
+  font-weight:bold;
 }
 
 .key:active{
   transform:scale(.93);
-  background:#1e293b;
 }
 
 .key-special{
-  background:#162033;
+  background:#172033;
   color:var(--accent);
 }
 
 .key-delete{
-  background:#330d0d;
+  background:#3a1010;
   color:#ff6666;
 }
 
-.key-enter{
-  background:#003344;
-  color:#00f5ff;
+.key-send{
+  background:linear-gradient(135deg,#00f5ff,#0080ff);
+  color:black;
 }
 
 .key-space{
   flex:4;
+  font-size:16px;
 }
 
 #toast{
@@ -154,14 +161,14 @@ textarea{
   bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  background:#111;
+  background:#111827;
   color:white;
-  padding:12px 20px;
-  border-radius:20px;
-  font-size:14px;
+  padding:14px 22px;
+  border-radius:30px;
   opacity:0;
   transition:.3s;
   pointer-events:none;
+  z-index:9999;
 }
 
 #toast.show{
@@ -171,12 +178,12 @@ textarea{
 @media(max-width:500px){
 
 .key{
-  height:48px;
-  font-size:18px;
+  height:58px;
+  font-size:22px;
 }
 
 textarea{
-  font-size:18px;
+  font-size:20px;
 }
 
 }
@@ -194,7 +201,7 @@ textarea{
 
 <div class="toolbar">
 
-<select class="tb-select" id="themeSelector">
+<select id="themeSelector" class="tb-select">
 <option value="cyber">CYBER</option>
 <option value="matrix">MATRIX</option>
 <option value="fire">FIRE</option>
@@ -209,12 +216,12 @@ textarea{
 
 <button class="tb-btn" onclick="clearText()">CLEAR</button>
 
-<button class="tb-btn" onclick="sendText()">SEND</button>
+<button class="tb-btn" onclick="toggleCaps()">CAPS</button>
 
 </div>
 
-<div class="output-wrapper">
-<textarea id="output" placeholder="Tape ici..."></textarea>
+<div class="output-box">
+<textarea id="output" placeholder="Tape ton message..."></textarea>
 </div>
 
 <div class="keyboard" id="keyboard"></div>
@@ -225,33 +232,39 @@ textarea{
 
 <script>
 
-const output = document.getElementById("output");
-const keyboard = document.getElementById("keyboard");
+const output=document.getElementById('output');
+const keyboard=document.getElementById('keyboard');
 
-let caps = false;
-let rgb = false;
-let rgbInterval = null;
+let caps=false;
+let rgb=false;
+let rgbInterval=null;
 
-const rows = [
+const rows=[
 ['q','w','e','r','t','y','u','i','o','p'],
 ['a','s','d','f','g','h','j','k','l'],
 ['z','x','c','v','b','n','m']
 ];
 
-function vibrate(ms=20){
+function vibrate(ms=25){
+
   if(navigator.vibrate){
     navigator.vibrate(ms);
   }
+
 }
 
-function showToast(msg){
-  const toast=document.getElementById("toast");
-  toast.textContent=msg;
-  toast.classList.add("show");
+function toast(msg){
+
+  const t=document.getElementById('toast');
+
+  t.textContent=msg;
+
+  t.classList.add('show');
 
   setTimeout(()=>{
-    toast.classList.remove("show");
+    t.classList.remove('show');
   },1500);
+
 }
 
 function insertText(text){
@@ -281,19 +294,19 @@ function buildKeyboard(){
     const row=document.createElement('div');
     row.className='row';
 
-    r.forEach(k=>{
+    r.forEach(letter=>{
 
       const key=document.createElement('button');
 
       key.className='key';
 
       key.textContent=
-        caps ? k.toUpperCase() : k;
+        caps ? letter.toUpperCase() : letter;
 
       key.addEventListener('touchstart',()=>{
 
         insertText(
-          caps ? k.toUpperCase() : k
+          caps ? letter.toUpperCase() : letter
         );
 
         vibrate();
@@ -309,16 +322,10 @@ function buildKeyboard(){
   });
 
   const bottom=document.createElement('div');
+
   bottom.className='row';
 
-  const shift=createSpecial('⇧',()=>{
-
-    caps=!caps;
-    buildKeyboard();
-
-  });
-
-  const space=createSpecial('SPACE',()=>{
+  const space=createKey('SPACE',()=>{
 
     insertText(' ');
 
@@ -326,33 +333,39 @@ function buildKeyboard(){
 
   space.classList.add('key-space');
 
-  const del=createSpecial('⌫',()=>{
+  const back=createKey('⌫',()=>{
 
     output.value=
       output.value.slice(0,-1);
 
   });
 
-  del.classList.add('key-delete');
+  back.classList.add('key-delete');
 
-  const enter=createSpecial('↵',()=>{
+  const enter=createKey('↵',()=>{
 
     insertText('\n');
 
   });
 
-  enter.classList.add('key-enter');
+  const send=createKey('SEND',()=>{
 
-  bottom.appendChild(shift);
+    sendText();
+
+  });
+
+  send.classList.add('key-send');
+
   bottom.appendChild(space);
-  bottom.appendChild(del);
+  bottom.appendChild(back);
   bottom.appendChild(enter);
+  bottom.appendChild(send);
 
   keyboard.appendChild(bottom);
 
 }
 
-function createSpecial(label,action){
+function createKey(label,action){
 
   const btn=document.createElement('button');
 
@@ -362,7 +375,7 @@ function createSpecial(label,action){
 
   btn.addEventListener('touchstart',()=>{
 
-    vibrate(30);
+    vibrate(35);
 
     action();
 
@@ -372,20 +385,32 @@ function createSpecial(label,action){
 
 }
 
+function toggleCaps(){
+
+  caps=!caps;
+
+  buildKeyboard();
+
+  toast(
+    caps ? 'MAJUSCULES' : 'minuscules'
+  );
+
+}
+
 function copyText(){
 
   if(!output.value.trim()){
 
-    showToast('RIEN A COPIER');
+    toast('RIEN A COPIER');
     return;
 
   }
 
   navigator.clipboard.writeText(output.value);
 
-  showToast('COPIÉ');
+  vibrate(60);
 
-  vibrate(50);
+  toast('COPIÉ');
 
 }
 
@@ -393,9 +418,9 @@ function clearText(){
 
   output.value='';
 
-  showToast('EFFACÉ');
+  vibrate(50);
 
-  vibrate(40);
+  toast('EFFACÉ');
 
 }
 
@@ -403,7 +428,7 @@ function sendText(){
 
   if(!output.value.trim()){
 
-    showToast('RIEN A ENVOYER');
+    toast('RIEN A ENVOYER');
     return;
 
   }
@@ -411,7 +436,7 @@ function sendText(){
   const text=
     encodeURIComponent(output.value);
 
-  vibrate(80);
+  vibrate(90);
 
   if(navigator.share){
 
@@ -421,12 +446,63 @@ function sendText(){
 
   }else{
 
-    window.location.href=
-      `sms:?body=${text}`;
+    location.href=
+    `sms:?body=${text}`;
 
   }
 
-  showToast('ENVOI...');
+  toast('ENVOI...');
+
+}
+
+function toggleRGB(){
+
+  rgb=!rgb;
+
+  const btn=
+  document.getElementById('rgbBtn');
+
+  if(rgb){
+
+    btn.style.background=
+    'linear-gradient(90deg,red,orange,yellow,green,blue,purple)';
+
+    let hue=0;
+
+    rgbInterval=setInterval(()=>{
+
+      document
+      .querySelectorAll('.key')
+      .forEach((k,i)=>{
+
+        k.style.border=
+        `2px solid hsl(${hue+i*10},100%,50%)`;
+
+      });
+
+      hue+=5;
+
+    },200);
+
+    toast('RGB ON');
+
+  }else{
+
+    clearInterval(rgbInterval);
+
+    document
+    .querySelectorAll('.key')
+    .forEach(k=>{
+
+      k.style.border='none';
+
+    });
+
+    btn.style.background='var(--key)';
+
+    toast('RGB OFF');
+
+  }
 
 }
 
@@ -434,7 +510,7 @@ const themes={
 
 cyber:{
 bg:'#030712',
-surface:'#0d1117',
+surface:'#0f172a',
 key:'#111827',
 accent:'#00f5ff'
 },
@@ -480,17 +556,17 @@ function applyTheme(name){
 
   const t=themes[name];
 
-  document.documentElement.style
-  .setProperty('--bg',t.bg);
+  document.documentElement
+  .style.setProperty('--bg',t.bg);
 
-  document.documentElement.style
-  .setProperty('--surface',t.surface);
+  document.documentElement
+  .style.setProperty('--surface',t.surface);
 
-  document.documentElement.style
-  .setProperty('--key',t.key);
+  document.documentElement
+  .style.setProperty('--key',t.key);
 
-  document.documentElement.style
-  .setProperty('--accent',t.accent);
+  document.documentElement
+  .style.setProperty('--accent',t.accent);
 
   localStorage.setItem(
     'ali_theme',
@@ -506,56 +582,6 @@ document
   applyTheme(this.value);
 
 });
-
-function toggleRGB(){
-
-  rgb=!rgb;
-
-  const btn=
-  document.getElementById('rgbBtn');
-
-  if(rgb){
-
-    btn.style.background='linear-gradient(90deg,red,orange,yellow,green,blue,purple)';
-
-    let hue=0;
-
-    rgbInterval=setInterval(()=>{
-
-      document
-      .querySelectorAll('.key')
-      .forEach((k,i)=>{
-
-        k.style.border=
-        `2px solid hsl(${hue+i*10},100%,50%)`;
-
-      });
-
-      hue+=5;
-
-    },180);
-
-    showToast('RGB ON');
-
-  }else{
-
-    clearInterval(rgbInterval);
-
-    document
-    .querySelectorAll('.key')
-    .forEach(k=>{
-
-      k.style.border='none';
-
-    });
-
-    btn.style.background='var(--key)';
-
-    showToast('RGB OFF');
-
-  }
-
-}
 
 const savedTheme=
 localStorage.getItem('ali_theme')
