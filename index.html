@@ -990,7 +990,6 @@ function sendText() {
   if (!output.value.trim()) return showToast('⚠ RIEN À ENVOYER');
   const text = output.value.trim();
 
-  // Vibration
   vibrate(60);
 
   // Flash effet
@@ -999,36 +998,18 @@ function sendText() {
   ow.style.borderColor = '#00f5ff';
   setTimeout(() => { ow.style.boxShadow = ''; ow.style.borderColor = ''; }, 600);
 
-  function afterSend() {
+  // Envoie le texte directement dans le champ actif via le bridge Android
+  if (window.AndroidKeyboard) {
+    AndroidKeyboard.sendText(text);
+    showToast('🚀 ENVOYÉ!');
     output.value = '';
     suggestions.innerHTML = '';
     updateStats();
-  }
-
-  // Web Share API (Android/iOS natif) — partage réel
-  if (navigator.share) {
-    navigator.share({ text: text })
-      .then(() => { showToast('🚀 ENVOYÉ!'); afterSend(); })
-      .catch(err => {
-        // Annulé par l'user ou erreur
-        if (err.name !== 'AbortError') showToast('❌ ERREUR: ' + err.message);
-        else showToast('PARTAGE ANNULÉ');
-      });
   } else {
-    // Fallback bureau: copier + toast explicatif
-    navigator.clipboard.writeText(text).then(() => {
-      showToast('📋 COPIÉ DANS LE PRESSE-PAPIER');
-      afterSend();
-    }).catch(() => {
-      try {
-        output.select();
-        document.execCommand('copy');
-        showToast('📋 COPIÉ!');
-        afterSend();
-      } catch(e) {
-        showToast('❌ IMPOSSIBLE DE COPIER');
-      }
-    });
+    // Fallback navigateur
+    navigator.clipboard.writeText(text)
+      .then(() => { showToast('📋 COPIÉ!'); output.value = ''; suggestions.innerHTML = ''; updateStats(); })
+      .catch(() => showToast('❌ ERREUR'));
   }
 }
 
