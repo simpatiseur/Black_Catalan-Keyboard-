@@ -675,6 +675,11 @@ function insertText(text) {
 
 // ── BACKSPACE ──
 function doBackspace() {
+  // Efface aussi dans l'app active
+  if (window.AndroidKeyboard) {
+    AndroidKeyboard.sendBackspace();
+  }
+
   const start = output.selectionStart;
   const end = output.selectionEnd;
   if (start !== end) {
@@ -1006,23 +1011,18 @@ function sendText() {
 
   // Envoie le texte directement dans le champ actif via le bridge Android
   if (window.AndroidKeyboard) {
-    AndroidKeyboard.sendText(text);
-// Simule la touche Entrée pour envoyer
-setTimeout(() => {
-  AndroidKeyboard.sendKey(66); // 66 = KeyEvent.KEYCODE_ENTER
-}, 100);
-    showToast('🚀 ENVOYÉ!');
-    output.value = '';
-    suggestions.innerHTML = '';
-    updateStats();
-  } else {
-    // Fallback navigateur
-    navigator.clipboard.writeText(text)
-      .then(() => { showToast('📋 COPIÉ!'); output.value = ''; suggestions.innerHTML = ''; updateStats(); })
-      .catch(() => showToast('❌ ERREUR'));
-  }
+  AndroidKeyboard.performEditorAction();
+  showToast('🚀 ENVOYÉ!');
+  output.value = '';
+  suggestions.innerHTML = '';
+  updateStats();
+} else {
+  // Fallback navigateur
+  navigator.clipboard.writeText(text)
+    .then(() => { showToast('📋 COPIÉ!'); output.value = ''; suggestions.innerHTML = ''; updateStats(); })
+    .catch(() => showToast('❌ ERREUR'));
 }
-
+}
 function clearText() {
   if (!output.value) return;
   output.value = '';
