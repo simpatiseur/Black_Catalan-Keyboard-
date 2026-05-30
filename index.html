@@ -533,6 +533,12 @@ function applyTheme(name) {
   document.body.style.backgroundColor = t.bg;
   try { localStorage.setItem('ali_theme', name); } catch(e) {}
 }
+  function setTheme(name, btn) {
+  applyTheme(name);
+  document.querySelectorAll('#themeGrid .panel-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  showToast('THÈME: ' + name.toUpperCase());
+  }
 
 
 
