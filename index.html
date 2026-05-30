@@ -375,8 +375,8 @@ body.has-bg .options-panel { background: rgba(13,17,23,0.93); backdrop-filter: b
       <button class="panel-btn" id="btnVoice" onclick="startVoice()">🎤 VOICE</button>
       <button class="panel-btn" onclick="translateWord();closePanel()">🌍 TRAD</button>
       <button class="panel-btn" onclick="fakeAI();closePanel()">🤖 AI</button>
-      <label class="panel-bg-label" for="bgUpload">🖼 FOND</label>
-      <input type="file" id="bgUpload" accept="image/*" style="display:none">
+      <input type="text" id="bgUrl" placeholder="URL image..." style="width:100%;padding:10px;background:var(--key);border:1px solid var(--key-border);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:12px;grid-column:1/-1;">
+<button class="panel-btn" onclick="applyBgUrl()">🖼 APPLIQUER</button>
       <button class="panel-btn" onclick="removeBg();closePanel()">🚫 NO BG</button>
     </div>
   </div>
@@ -970,9 +970,9 @@ function showToast(msg) {
 }
 
 // ── BG UPLOAD (FIXED) ──
-document.getElementById('bgUpload').addEventListener('change', function(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const url = URL.createObjectURL(file);
+function applyBgUrl() {
+  const url = document.getElementById('bgUrl').value.trim();
+  if (!url) return showToast('⚠ ENTRE UNE URL');
   document.body.style.backgroundImage = `url(${url})`;
   document.body.style.backgroundSize = 'cover';
   document.body.style.backgroundPosition = 'center';
@@ -980,8 +980,7 @@ document.getElementById('bgUpload').addEventListener('change', function(e) {
   document.body.classList.add('has-bg');
   showToast('🖼 FOND APPLIQUÉ');
   closePanel();
-  this.value = '';
-});
+}
 
 // ── KEYBOARD SHORTCUTS ──
 document.addEventListener('keydown', e=>{
