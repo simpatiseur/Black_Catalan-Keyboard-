@@ -394,8 +394,7 @@ body.has-bg .options-panel { background: rgba(13,17,23,0.93); backdrop-filter: b
   <div class="header">
     <div class="logo">ALI <span>KEY</span>BOARD</div>
     <div class="header-right">
-      <div class="status" id="statusLabel">● ONLINE</div>
-      <button class="menu-btn" id="menuBtn" onclick="openPanel()">☰</button>
+  <div class="status" id="statusLabel">● ONLINE</div>
     </div>
   </div>
 
@@ -466,9 +465,22 @@ function closePanel() {
   document.getElementById('panelOverlay').classList.remove('open');
 }
 // Swipe right to close
-let px0 = 0;
+let px0 = 0, swipeStartX = 0, swipeStartY = 0;
+
+// Swipe droite dans le panel → ferme
 document.getElementById('optionsPanel').addEventListener('touchstart', e => { px0 = e.touches[0].clientX; }, {passive:true});
 document.getElementById('optionsPanel').addEventListener('touchend', e => { if (e.changedTouches[0].clientX - px0 > 55) closePanel(); }, {passive:true});
+
+// Swipe gauche sur l'écran → ouvre le panel
+document.addEventListener('touchstart', e => {
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+}, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - swipeStartX;
+  const dy = Math.abs(e.changedTouches[0].clientY - swipeStartY);
+  if (dx < -60 && dy < 40) openPanel();
+}, {passive:true});
 
 // ── LAYOUTS ──
 const layouts = {
@@ -795,7 +807,14 @@ function buildKeyboard() {
   delBtn.addEventListener('mousedown',startDel); delBtn.addEventListener('touchstart',startDel,{passive:true});
   delBtn.addEventListener('mouseup',stopDel); delBtn.addEventListener('mouseleave',stopDel); delBtn.addEventListener('touchend',stopDel);
 
-  br.append(shiftBtn,numBtn,spaceBtn,emojiBtn,delBtn,enterBtn);
+  const sendBtn = makeKey('🚀', ()=>{ sendText(); vibrate(30); playClick('special'); });
+sendBtn.className += ' key-special';
+sendBtn.style.maxWidth = '50px';
+sendBtn.style.background = 'linear-gradient(135deg,#00f5ff,#0080ff)';
+sendBtn.style.color = '#000';
+sendBtn.style.borderColor = '#00f5ff';
+
+br.append(shiftBtn,numBtn,spaceBtn,emojiBtn,delBtn,enterBtn,sendBtn);
   keyboard.appendChild(br);
 
   if (rgb) scheduleRGB();
