@@ -865,16 +865,17 @@ function toggleRGB() {
 let lastRgbTime = 0;
 function scheduleRGB() {
   if (rgbRaf) cancelAnimationFrame(rgbRaf);
+  let keys = [];
   function frame(ts) {
     if (!rgb) return;
-    if (ts - lastRgbTime > 60) { // ~16fps, smooth but not heavy
+    if (ts - lastRgbTime > 80) {
       lastRgbTime = ts;
-      rgbHue = (rgbHue + 1.5) % 360;
-      const keys = document.querySelectorAll('.key');
+      rgbHue = (rgbHue + 2) % 360;
+      if (!keys.length) keys = Array.from(document.querySelectorAll('.key'));
       keys.forEach((k,i) => {
         const h = (rgbHue + i*10) % 360;
         k.style.borderColor = `hsl(${h},100%,55%)`;
-        k.style.boxShadow = `0 0 5px hsl(${h},100%,55%)44`;
+        k.style.boxShadow = `0 0 4px hsl(${h},100%,55%)33`;
       });
     }
     rgbRaf = requestAnimationFrame(frame);
