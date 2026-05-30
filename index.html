@@ -589,7 +589,7 @@ function insertText(text) {
   const pos = s + text.length;
   output.selectionStart = output.selectionEnd = pos;
   output.focus();
-  autoCorrect(); saveWord(text); showSuggestions(); updateStats();
+   saveWord(text); showSuggestions(); updateStats();
 }
 
 // ── BACKSPACE ──
@@ -616,17 +616,7 @@ const corrections = {
   jvs:'je vais',tfk:"t'as fait quoi",vrmt:'vraiment',pcq:'parce que',
   jsp:'je sais pas',jpp:'j\'en peux plus',tkt:'t\'inquiète'
 };
-function autoCorrect() {
-  const words = output.value.split(/\s/);
-  const last = words[words.length-1];
-  const fix = corrections[last.toLowerCase()];
-  if (fix) {
-    words[words.length-1] = fix;
-    const pos = output.selectionStart;
-    output.value = words.join(' ');
-    output.selectionStart = output.selectionEnd = pos + (fix.length - last.length);
-  }
-}
+
 
 // ── DICTIONARY (FR + EN enrichi) ──
 const dictionary = [
@@ -705,9 +695,14 @@ function showSuggestions() {
     div.className = 'sug-item';
     div.textContent = caps ? word.toUpperCase() : word;
     div.addEventListener('click', () => {
-      const ws = output.value.split(/\s/);
-      ws[ws.length-1] = word;
-      output.value = ws.join(' ') + ' ';
+  const ws = output.value.split(/\s/);
+  const partial = ws[ws.length-1];
+  ws[ws.length-1] = word;
+  output.value = ws.join(' ') + ' ';
+  if (window.AndroidKeyboard) {
+    for (let i=0; i<partial.length; i++) AndroidKeyboard.sendBackspace();
+    AndroidKeyboard.sendText(word + ' ');
+  }
       if (window.AndroidKeyboard) {
   AndroidKeyboard.sendBackspace(); // efface le mot partiel
   AndroidKeyboard.sendText(word + ' '); // envoie le mot complet
