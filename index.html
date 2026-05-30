@@ -972,15 +972,14 @@ function showToast(msg) {
 // ── BG UPLOAD (FIXED) ──
 document.getElementById('bgUpload').addEventListener('change', function(e) {
   const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    document.body.style.cssText += `background-image:url(${ev.target.result}) !important;background-size:cover !important;background-position:center !important;background-attachment:fixed !important;`;
-    document.body.classList.add('has-bg');
-    showToast('🖼 FOND APPLIQUÉ');
-    closePanel();
-  };
-  reader.readAsDataURL(file);
-  // Reset so same file can be re-selected
+  const url = URL.createObjectURL(file);
+  document.body.style.backgroundImage = `url(${url})`;
+  document.body.style.backgroundSize = 'cover';
+  document.body.style.backgroundPosition = 'center';
+  document.body.style.backgroundAttachment = 'fixed';
+  document.body.classList.add('has-bg');
+  showToast('🖼 FOND APPLIQUÉ');
+  closePanel();
   this.value = '';
 });
 
