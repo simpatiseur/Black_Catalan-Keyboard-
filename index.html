@@ -1002,7 +1002,7 @@ output.addEventListener('keyup', showSuggestions);
 // ── INIT ──
 try {
   const saved = localStorage.getItem('ali_theme');
-  if (saved && themes[saved]) { document.getElementById('themeSelector').value=saved; applyTheme(saved); }
+  if (saved && themes[saved]) applyTheme(saved);
   else applyTheme('cyber');
 } catch(e) { applyTheme('cyber'); }
 
