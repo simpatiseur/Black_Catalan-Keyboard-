@@ -705,6 +705,10 @@ function showSuggestions() {
       const ws = output.value.split(/\s/);
       ws[ws.length-1] = word;
       output.value = ws.join(' ') + ' ';
+      if (window.AndroidKeyboard) {
+  AndroidKeyboard.sendBackspace(); // efface le mot partiel
+  AndroidKeyboard.sendText(word + ' '); // envoie le mot complet
+      }
       output.selectionStart = output.selectionEnd = output.value.length;
       if (window.AndroidKeyboard) {
         // sync with app: remove partial word and type full word
