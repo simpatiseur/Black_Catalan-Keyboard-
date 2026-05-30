@@ -699,10 +699,14 @@ function showSuggestions() {
   const partial = ws[ws.length-1];
   ws[ws.length-1] = word;
   output.value = ws.join(' ') + ' ';
+  output.selectionStart = output.selectionEnd = output.value.length;
   if (window.AndroidKeyboard) {
     for (let i=0; i<partial.length; i++) AndroidKeyboard.sendBackspace();
     AndroidKeyboard.sendText(word + ' ');
   }
+  suggestions.innerHTML = '';
+  updateStats(); vibrate(15);
+});
       if (window.AndroidKeyboard) {
   AndroidKeyboard.sendBackspace(); // efface le mot partiel
   AndroidKeyboard.sendText(word + ' '); // envoie le mot complet
