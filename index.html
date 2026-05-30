@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<title>ALI KEYBOARD — ULTRA</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #030712;
+  --surface: #0d1117;
+  --key: #111827;
+  --key-border: #1f2937;
+  --accent: #00f5ff;
+  --accent2: #ff00ff;
+  --accent3: #7c3aed;
+  --text: #e2e8f0;
+  --glow: 0 0 12px #00f5ff66, 0 0 30px #00f5ff22;
+  --glow2: 0 0 12px #ff00ff66, 0 0 30px #ff00ff22;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Orbitron', sans-serif;
+  --panel-transition: 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+html, body {
+  width: 100%; height: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  overflow: hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, #00f5ff0a 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, #ff00ff08 0%, transparent 60%);
+}
+
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, #00000018 2px, #00000018 4px);
+  pointer-events:none;
+  z-index:9999;
+}
+
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(#00f5ff06 1px, transparent 1px),
+    linear-gradient(90deg, #00f5ff06 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── SWIPE CONTAINER ── */
+.app-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Two-panel slider */
+.panels-track {
+  display: flex;
+  width: 200%;
+  height: 100%;
+  transition: transform var(--panel-transition);
+  will-change: transform;
+}
+
+.panels-track.show-options {
+  transform: translateX(-50%);
+}
+
+.panel {
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── MAIN PANEL (textarea + keyboard) ── */
+.main-panel {
+  padding: 5px 5px 0 5px;
+  gap: 4px;
+}
+
+/* ── OPTIONS PANEL ── */
+.options-panel {
+  background: var(--bg);
+  padding: 5px 5px 0 5px;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 2px;
+  flex-shrink: 0;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: clamp(13px, 3.5vw, 20px);
+  font-weight: 900;
+  color: var(--accent);
+  text-shadow: var(--glow);
+  letter-spacing: 4px;
+}
+
+.logo span { color: var(--accent2); text-shadow: var(--glow2); }
+
+.status {
+  font-size: 10px;
+  color: #00f5ff88;
+  letter-spacing: 2px;
+  animation: blink 2s infinite;
+}
+
+/* Options toggle button */
+.btn-options-toggle {
+  background: var(--key);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: var(--glow);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-options-toggle:active { transform: scale(0.95); }
+.btn-options-toggle .arrow { font-size: 12px; transition: transform 0.3s; }
+.show-options .btn-options-toggle .arrow { transform: rotate(180deg); }
+
+/* Back button in options panel */
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--key);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  width: fit-content;
+  box-shadow: var(--glow);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-back:active { transform: scale(0.96); }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── TOOLBAR (options panel) ── */
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.tb-btn {
+  padding: 11px 8px;
+  border: 1px solid var(--key-border);
+  border-radius: 12px;
+  background: var(--key);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.tb-btn:hover, .tb-btn:active { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); transform: translateY(-1px); }
+.tb-btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: var(--glow); font-weight: bold; }
+.tb-btn.active2 { background: var(--accent2); color: #000; border-color: var(--accent2); box-shadow: var(--glow2); font-weight: bold; }
+
+/* Full-width toolbar buttons */
+.tb-btn.full { grid-column: 1 / -1; }
+
+/* Theme selector */
+.tb-select {
+  grid-column: 1 / -1;
+  padding: 10px 12px;
+  border: 1px solid var(--key-border);
+  border-radius: 12px;
+  background: var(--key);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+.tb-select:focus { border-color: var(--accent); box-shadow: var(--glow); }
+
+/* Options section label */
+.opt-section {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  opacity: 0.6;
+  padding: 4px 4px 0;
+  flex-shrink: 0;
+}
+
+/* ── OUTPUT ── */
+.output-wrapper {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--key-border);
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.output-wrapper::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  background-size: 200% 100%;
+  animation: scanline 4s linear infinite;
+}
+
+@keyframes scanline { 0%{background-position:0%} 100%{background-position:200%} }
+
+.output-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  padding: 5px 10px 0;
+  opacity: .7;
+}
+
+textarea {
+  width: 100%;
+  min-height: 65px;
+  max-height: 115px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 19px;
+  resize: none;
+  padding: 6px 12px 8px;
+  line-height: 1.55;
+  caret-color: var(--accent);
+}
+
+.output-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 10px 4px;
+  font-size: 9px;
+  color: #ffffff33;
+  letter-spacing: 1px;
+}
+
+/* ── SUGGESTIONS ── */
+.suggestions {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: none;
+  min-height: 32px;
+  flex-shrink: 0;
+}
+.suggestions::-webkit-scrollbar { display:none; }
+
+.sug-item {
+  padding: 5px 12px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all .12s;
+  letter-spacing: 1px;
+  animation: fadeIn .2s ease;
+}
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+.sug-item:hover, .sug-item:active { background: var(--accent); color: #000; box-shadow: var(--glow); }
+
+/* ── KEYBOARD ── */
+.keyboard-container {
+  background: var(--surface);
+  border: 1px solid var(--key-border);
+  border-radius: 14px 14px 0 0;
+  padding: 6px 5px 4px;
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+}
+
+.keyboard-container::after {
+  content:'';
+  position:absolute; bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+}
+
+.keyboard { display: flex; flex-direction: column; gap: 4px; }
+
+.row { display: flex; gap: 3px; justify-content: center; }
+
+/* Keys */
+.key {
+  flex: 1;
+  min-width: 26px;
+  max-width: 58px;
+  height: 40px;
+  border: 1px solid var(--key-border);
+  border-radius: 9px;
+  background: var(--key);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .15s, box-shadow .15s, transform .1s, background .15s;
+  user-select: none;
+}
+
+.key::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(180deg, #ffffff0a 0%, transparent 100%);
+  border-radius: inherit;
+  pointer-events:none;
+}
+
+.key:active, .key.pressed {
+  transform: scale(.92) translateY(1px);
+  background: #1e293b;
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+/* Ripple */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .3;
+  transform: scale(0);
+  animation: ripple-anim .35s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
+
+/* Special keys */
+.key-special {
+  background: linear-gradient(135deg, #1a2744, #0f172a);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  max-width: none;
+}
+.key-special:active { box-shadow: var(--glow); }
+
+.key-delete {
+  background: linear-gradient(135deg, #3d0a0a, #1a0a0a);
+  border-color: #ff444466;
+  color: #ff6666;
+}
+.key-delete:active { border-color: #ff4444; box-shadow: 0 0 12px #ff444466; }
+
+.key-space {
+  flex: 4;
+  max-width: none;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #ffffff44;
+}
+
+.key-enter {
+  background: linear-gradient(135deg, #003d3d, #001a1a);
+  border-color: var(--accent);
+  color: var(--accent);
+  max-width: none;
+}
+
+.key-shift.active, .key-num.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: var(--glow); }
+.key-emoji.active { background: var(--accent2); color: #000; border-color: var(--accent2); box-shadow: var(--glow2); }
+
+.key .sub {
+  display: block;
+  font-size: 7px;
+  color: #ffffff33;
+  line-height: 1;
+}
+
+/* ── ARROWS ── */
+.arrow-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 3px;
+}
+
+.arrow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 38px);
+  grid-template-rows: repeat(2, 34px);
+  gap: 4px;
+}
+
+.arrow-grid .key { min-width: unset; width: 38px; height: 34px; font-size: 13px; max-width: none; flex: none; }
+.arrow-grid .key-blank { background: transparent; border-color: transparent; pointer-events: none; }
+
+/* ── MODE BAR ── */
+.mode-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 0;
+  flex-shrink: 0;
+}
+.mode-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--key-border);
+  transition: background .2s, box-shadow .2s;
+}
+.mode-dot.active { background: var(--accent); box-shadow: var(--glow); }
+.mode-dot.active2 { background: var(--accent2); box-shadow: var(--glow2); }
+.mode-label {
+  font-size: 9px;
+  color: #ffffff33;
+  letter-spacing: 2px;
+  font-family: var(--font-display);
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 2px;
+  box-shadow: var(--glow);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index: 10000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── RGB SMOOTH ── */
+@keyframes rgbBorderCycle {
+  0%   { border-color: #ff0044; box-shadow: 0 0 8px #ff004466; }
+  16%  { border-color: #ff8800; box-shadow: 0 0 8px #ff880066; }
+  33%  { border-color: #ffff00; box-shadow: 0 0 8px #ffff0066; }
+  50%  { border-color: #00ff88; box-shadow: 0 0 8px #00ff8866; }
+  66%  { border-color: #0088ff; box-shadow: 0 0 8px #0088ff66; }
+  83%  { border-color: #cc00ff; box-shadow: 0 0 8px #cc00ff66; }
+  100% { border-color: #ff0044; box-shadow: 0 0 8px #ff004466; }
+}
+
+.rgb-key {
+  animation: rgbBorderCycle 3s linear infinite;
+  animation-delay: var(--rgb-delay, 0s);
+}
+
+/* BG image mode */
+body.has-bg .keyboard-container,
+body.has-bg .output-wrapper,
+body.has-bg .options-panel { backdrop-filter: blur(20px); }
+
+/* Swipe hint dot indicator */
+.swipe-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 0;
+  flex-shrink: 0;
+}
+.swipe-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #ffffff22;
+  transition: background 0.3s, transform 0.3s;
+}
+.swipe-dot.active {
+  background: var(--accent);
+  transform: scale(1.3);
+  box-shadow: var(--glow);
+}
+
+/* Transition for theme changes */
+body, .key, .keyboard-container, .output-wrapper, textarea {
+  transition: background .4s, border-color .4s, color .4s;
+}
+</style>
+</head>
+<body>
+
+<div class="app-root">
+  <div class="panels-track" id="panelsTrack">
+
+    <!-- ══════════════ PANEL 1: MAIN (textarea + keyboard) ══════════════ -->
+    <div class="panel main-panel">
+
+      <!-- Header -->
+      <div class="header">
+        <div class="logo">ALI <span>KEY</span>BOARD</div>
+        <button class="btn-options-toggle" id="btnToggleOptions" onclick="toggleOptionsPanel()">
+          OPTIONS <span class="arrow">▶</span>
+        </button>
+        <div class="status" id="statusLabel">● ONLINE</div>
+      </div>
+
+      <!-- Swipe dots -->
+      <div class="swipe-dots">
+        <div class="swipe-dot active" id="dot-panel-0"></div>
+        <div class="swipe-dot" id="dot-panel-1"></div>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="output-wrapper">
+        <div class="output-label">OUTPUT TERMINAL</div>
+        <textarea id="output" placeholder="// Tape ici..." spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="sentences"></textarea>
+        <div class="output-footer">
+          <span id="charCount">0 chars</span>
+          <span id="wordCount">0 words</span>
+          <span id="lineCount">1 line</span>
+        </div>
+      </div>
+
+      <!-- SUGGESTIONS -->
+      <div class="suggestions" id="suggestions"></div>
+
+      <!-- MODE BAR -->
+      <div class="mode-bar">
+        <div class="mode-dot active" id="dot-alpha"></div>
+        <div class="mode-dot" id="dot-num"></div>
+        <div class="mode-dot" id="dot-emoji"></div>
+        <span class="mode-label" id="modeLabel">ALPHA</span>
+      </div>
+
+      <!-- KEYBOARD -->
+      <div class="keyboard-container">
+        <div class="keyboard" id="keyboard"></div>
+        <div class="arrow-section">
+          <div class="arrow-grid" id="arrowGrid">
+            <button class="key key-blank"></button>
+            <button class="key key-special" onclick="moveCursor('up')">▲</button>
+            <button class="key key-blank"></button>
+            <button class="key key-special" onclick="moveCursor('left')">◀</button>
+            <button class="key key-special" onclick="moveCursor('down')">▼</button>
+            <button class="key key-special" onclick="moveCursor('right')">▶</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-panel -->
+
+    <!-- ══════════════ PANEL 2: OPTIONS ══════════════ -->
+    <div class="panel options-panel" id="optionsPanel">
+
+      <!-- Header -->
+      <div class="header">
+        <button class="btn-back" onclick="toggleOptionsPanel()">◀ RETOUR</button>
+        <div class="logo" style="font-size:13px;">⚙ OPTIONS</div>
+        <div class="swipe-dots">
+          <div class="swipe-dot" id="dot-panel-0b"></div>
+          <div class="swipe-dot active" id="dot-panel-1b"></div>
+        </div>
+      </div>
+
+      <!-- THEME -->
+      <div class="opt-section">THÈME</div>
+      <div class="toolbar">
+        <select class="tb-select" id="themeSelector">
+          <option value="cyber">⚡ CYBER</option>
+          <option value="matrix">🟢 MATRIX</option>
+          <option value="fire">🔥 FIRE</option>
+          <option value="purple">💜 NEBULA</option>
+          <option value="gold">✨ GOLD</option>
+          <option value="ice">❄️ ICE</option>
+        </select>
+      </div>
+
+      <!-- CLAVIER -->
+      <div class="opt-section">CLAVIER</div>
+      <div class="toolbar">
+        <button class="tb-btn" id="btnLayout" onclick="toggleLayout()">AZERTY</button>
+        <button class="tb-btn" id="btnCaps" onclick="toggleCaps()">⇧ CAPS</button>
+        <button class="tb-btn" id="btnNum" onclick="toggleNumbers()">123</button>
+        <button class="tb-btn" id="btnEmoji" onclick="toggleEmoji()">😊 EMOJI</button>
+        <button class="tb-btn" id="btnRGB" onclick="toggleRGB()">🌈 RGB</button>
+        <button class="tb-btn" id="btnSound" onclick="toggleSound()">🔊 SON</button>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="opt-section">ACTIONS</div>
+      <div class="toolbar">
+        <button class="tb-btn" onclick="copyText()">📋 COPY</button>
+        <button class="tb-btn" onclick="clearText()">🗑 CLEAR</button>
+        <button class="tb-btn" id="btnVoice" onclick="startVoice()">🎤 VOICE</button>
+        <button class="tb-btn" onclick="translateWord()">🌍 TRAD</button>
+        <button class="tb-btn" onclick="fakeAI()">🤖 AI</button>
+        <label class="tb-btn" style="cursor:pointer">🖼 BG<input type="file" id="bgUpload" accept="image/*" style="display:none"></label>
+        <button class="tb-btn full" id="btnSend" onclick="sendText()" style="background:linear-gradient(135deg,#00f5ff,#0080ff);color:#000;font-weight:bold;border-color:#00f5ff;">🚀 SEND</button>
+      </div>
+
+    </div><!-- /options-panel -->
+
+  </div><!-- /panels-track -->
+</div><!-- /app-root -->
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ──
+const output = document.getElementById('output');
+const keyboard = document.getElementById('keyboard');
+const suggestions = document.getElementById('suggestions');
+const panelsTrack = document.getElementById('panelsTrack');
+
+let caps = false;
+let emojiMode = false;
+let numberMode = false;
+let layout = 'qwerty';
+let rgb = false;
+let rgbAnimId = null;
+let soundEnabled = true;
+let holdDeleteTimer = null;
+let holdDeleteInterval = null;
+let optionsPanelOpen = false;
+
+// ── SAVED DATA ──
+let savedWords = [];
+try { savedWords = JSON.parse(localStorage.getItem('ali_words') || '[]'); } catch(e) {}
+
+// ── PANEL TOGGLE ──
+function toggleOptionsPanel() {
+  optionsPanelOpen = !optionsPanelOpen;
+  panelsTrack.classList.toggle('show-options', optionsPanelOpen);
+  // Update dots
+  document.getElementById('dot-panel-0').classList.toggle('active', !optionsPanelOpen);
+  document.getElementById('dot-panel-1').classList.toggle('active', optionsPanelOpen);
+  document.getElementById('dot-panel-0b').classList.toggle('active', !optionsPanelOpen);
+  document.getElementById('dot-panel-1b').classList.toggle('active', optionsPanelOpen);
+}
+
+// Touch/swipe detection for panel switching
+let touchStartX = 0, touchStartY = 0;
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) < Math.abs(dy) * 1.5) return; // mostly vertical = ignore
+  if (Math.abs(dx) < 50) return; // too short
+  if (dx < 0 && !optionsPanelOpen) toggleOptionsPanel();   // swipe left → options
+  if (dx > 0 && optionsPanelOpen) toggleOptionsPanel();    // swipe right → main
+}, { passive: true });
+
+// ── LAYOUTS ──
+const layouts = {
+  qwerty: [
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l'],
+    ['z','x','c','v','b','n','m']
+  ],
+  azerty: [
+    ['a','z','e','r','t','y','u','i','o','p'],
+    ['q','s','d','f','g','h','j','k','l','m'],
+    ['w','x','c','v','b','n']
+  ]
+};
+
+// Extra French/special characters row
+const frenchExtra = ['ç','à','é','è','ê','ë','î','ï','ô','ù','û','ü','œ','æ','ñ','…','«','»'];
+
+const numbers = [
+  ['1','2','3','4','5','6','7','8','9','0'],
+  ['!','@','#','$','%','^','&','*','(',')',],
+  ['-','_','=','+','[',']','{','}','\\','|'],
+  [';',':','\'','"',',','.','<','>','/','?'],
+  ['€','£','¥','₩','₿','©','®','™','°','~']
+];
+
+const emojis = [
+  '😀','😂','🤣','😍','😘','😎','🥵','😭','😤','🤖',
+  '❤️','🧡','💛','💚','💙','💜','🖤','🤍','💔','✨',
+  '🔥','⚡','💯','🎉','🎊','🚀','💎','👑','🏆','🎮',
+  '👍','👎','👋','🤝','🙏','💪','🫶','✌️','🤞','👀',
+  '🌈','🌙','⭐','🌟','💫','🌊','🍀','🦋','🐉','🦄'
+];
+
+// ── THEMES ──
+const themes = {
+  cyber:  { bg:'#030712', surface:'#0d1117', key:'#111827', border:'#1f2937', accent:'#00f5ff', accent2:'#ff00ff' },
+  matrix: { bg:'#000a00', surface:'#001400', key:'#001a00', border:'#003300', accent:'#00ff41', accent2:'#00cc33' },
+  fire:   { bg:'#0a0000', surface:'#1a0000', key:'#2a0000', border:'#440000', accent:'#ff6600', accent2:'#ff0000' },
+  purple: { bg:'#0a0014', surface:'#13001f', key:'#1a002e', border:'#2d0050', accent:'#bf00ff', accent2:'#7c3aed' },
+  gold:   { bg:'#0a0800', surface:'#1a1400', key:'#2a2000', border:'#443300', accent:'#ffd700', accent2:'#ffaa00' },
+  ice:    { bg:'#000a1a', surface:'#001428', key:'#001e38', border:'#003355', accent:'#88ddff', accent2:'#00aaff' }
+};
+
+function applyTheme(name) {
+  const t = themes[name] || themes.cyber;
+  const r = document.documentElement.style;
+  r.setProperty('--bg', t.bg);
+  r.setProperty('--surface', t.surface);
+  r.setProperty('--key', t.key);
+  r.setProperty('--key-border', t.border);
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--accent2', t.accent2);
+  r.setProperty('--glow', `0 0 12px ${t.accent}66, 0 0 30px ${t.accent}22`);
+  r.setProperty('--glow2', `0 0 12px ${t.accent2}66, 0 0 30px ${t.accent2}22`);
+  showToast('THEME: ' + name.toUpperCase());
+}
+
+// Fix: attach change event after DOM ready
+document.getElementById('themeSelector').addEventListener('change', function() {
+  applyTheme(this.value);
+});
+
+// ── AUDIO ──
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playClick(type) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    if (type === 'delete') { osc.frequency.value = 220; gain.gain.value = 0.06; }
+    else if (type === 'special') { osc.frequency.value = 880; gain.gain.value = 0.06; }
+    else { osc.frequency.value = 600 + Math.random() * 150; gain.gain.value = 0.045; }
+    osc.type = 'sine';
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.07);
+    osc.stop(ctx.currentTime + 0.07);
+  } catch(e) {}
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('btnSound');
+  btn.textContent = soundEnabled ? '🔊 SON' : '🔇 SON';
+  btn.classList.toggle('active', soundEnabled);
+  showToast(soundEnabled ? 'SON ACTIVÉ' : 'SON DÉSACTIVÉ');
+}
+
+// ── VIBRATION ──
+function vibrate(ms) {
+  try { if (navigator.vibrate) navigator.vibrate(ms || 18); } catch(e) {}
+}
+
+// ── RIPPLE ──
+function addRipple(btn, e) {
+  const rect = btn.getBoundingClientRect();
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.cssText = `width:${rect.width}px;height:${rect.width}px;left:${x - rect.width/2}px;top:${y - rect.width/2}px`;
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 400);
+}
+
+// ── INSERT TEXT ──
+function insertText(text) {
+  if (window.AndroidKeyboard) AndroidKeyboard.sendText(text);
+  const start = output.selectionStart;
+  const end = output.selectionEnd;
+  output.value = output.value.substring(0, start) + text + output.value.substring(end);
+  const pos = start + text.length;
+  output.selectionStart = output.selectionEnd = pos;
+  output.focus();
+  autoCorrect();
+  saveWord(text);
+  showSuggestions();
+  updateStats();
+}
+
+// ── BACKSPACE ──
+function doBackspace() {
+  if (window.AndroidKeyboard) AndroidKeyboard.sendBackspace();
+  const start = output.selectionStart;
+  const end = output.selectionEnd;
+  if (start !== end) {
+    output.value = output.value.substring(0, start) + output.value.substring(end);
+    output.selectionStart = output.selectionEnd = start;
+  } else if (start > 0) {
+    output.value = output.value.substring(0, start - 1) + output.value.substring(start);
+    output.selectionStart = output.selectionEnd = start - 1;
+  }
+  output.focus();
+  showSuggestions();
+  updateStats();
+}
+
+// ── STATS ──
+function updateStats() {
+  const v = output.value;
+  document.getElementById('charCount').textContent = v.length + ' chars';
+  document.getElementById('wordCount').textContent = (v.trim() ? v.trim().split(/\s+/).length : 0) + ' words';
+  document.getElementById('lineCount').textContent = v.split('\n').length + ' line(s)';
+}
+
+// ── AUTOCORRECT ──
+const corrections = {
+  bonjor:'bonjour', merc:'merci', helo:'hello', keybord:'keyboard',
+  nn:'non', slt:'salut', bjr:'bonjour', mdr:'mort de rire',
+  jvs:'je vais', tfk:'t\'as fait quoi'
+};
+function autoCorrect() {
+  const words = output.value.split(/\s/);
+  const last = words[words.length - 1];
+  if (corrections[last.toLowerCase()]) {
+    words[words.length - 1] = corrections[last.toLowerCase()];
+    const pos = output.selectionStart;
+    output.value = words.join(' ');
+    output.selectionStart = output.selectionEnd = pos + (corrections[last.toLowerCase()].length - last.length);
+  }
+}
+
+// ── SUGGESTIONS ──
+const dictionary = [
+  'bonjour','salut','merci','maison','ordinateur','clavier','android','gaming',
+  'hello','keyboard','developer','javascript','html','css','france','anglais',
+  'français','intelligence','emoji','background','sketchware','mobile','application',
+  'futuriste','cyber','neon','ultra','projet','code','design','interface','robot',
+  'système','message','texte','envoyer','copier','effacer','couleur','thème','son',
+  'voix','mode','police','taille','langue','layout','musique','photo','image',
+  'fichier','partager','oui','non','super','génial','cool','sympa','comment',
+  'quoi','pourquoi','quand','mais','donc','alors','parce','depuis','pendant',
+  'après','avec','sans','pour','dans','sur','sous','entre','chez','vers',
+  'bonsoir','bonne','nuit','journée','semaine','mois','année','travail','école',
+  'voiture','téléphone','famille','ami','manger','boire','dormir','aller','venir',
+  'faire','dire','voir','aimer','vouloir','pouvoir','savoir','prendre','mettre',
+  'nouveau','belle','beau','grand','petit','rapide','lent','facile','difficile',
+  'important','possible','impossible','vrai','faux'
+];
+
+function saveWord(text) {
+  if (text.length < 2) return;
+  const words = output.value.split(/\s+/);
+  const last = words[words.length - 1];
+  if (last.length > 2 && !savedWords.includes(last)) {
+    savedWords.push(last);
+    try { localStorage.setItem('ali_words', JSON.stringify(savedWords.slice(-200))); } catch(e) {}
+  }
+}
+
+function showSuggestions() {
+  suggestions.innerHTML = '';
+  const words = output.value.split(/\s/);
+  const current = words[words.length - 1].toLowerCase();
+  if (current.length < 1) return;
+  const pool = [...new Set([...savedWords, ...dictionary])];
+  const exact = pool.filter(w => w.toLowerCase().startsWith(current) && w.toLowerCase() !== current);
+  const partial = pool.filter(w => !w.toLowerCase().startsWith(current) && w.toLowerCase().includes(current) && w.toLowerCase() !== current);
+  const matches = [...exact, ...partial].slice(0, 8);
+  matches.forEach(word => {
+    const div = document.createElement('div');
+    div.className = 'sug-item';
+    div.textContent = caps ? word.toUpperCase() : word;
+    div.addEventListener('click', () => {
+      const ws = output.value.split(/\s/);
+      ws[ws.length - 1] = word;
+      output.value = ws.join(' ') + ' ';
+      output.selectionStart = output.selectionEnd = output.value.length;
+      suggestions.innerHTML = '';
+      updateStats();
+      vibrate(15);
+    });
+    suggestions.appendChild(div);
+  });
+}
+
+// ── CURSOR MOVEMENT ──
+function moveCursor(dir) {
+  let pos = output.selectionStart;
+  const v = output.value;
+  if (dir === 'left') pos = Math.max(0, pos - 1);
+  else if (dir === 'right') pos = Math.min(v.length, pos + 1);
+  else if (dir === 'up') {
+    const lineStart = v.lastIndexOf('\n', pos - 1);
+    const prevLineStart = v.lastIndexOf('\n', lineStart - 1);
+    const col = pos - lineStart - 1;
+    pos = Math.min(prevLineStart + 1 + col, lineStart === -1 ? pos : lineStart);
+  } else if (dir === 'down') {
+    const lineEnd = v.indexOf('\n', pos);
+    if (lineEnd === -1) { pos = v.length; }
+    else {
+      const nextLineEnd = v.indexOf('\n', lineEnd + 1);
+      const lineStart = v.lastIndexOf('\n', pos - 1);
+      const col = pos - lineStart - 1;
+      pos = Math.min(lineEnd + 1 + col, nextLineEnd === -1 ? v.length : nextLineEnd);
+    }
+  }
+  output.selectionStart = output.selectionEnd = pos;
+  output.focus();
+  vibrate(10);
+}
+
+// ── BUILD KEYBOARD ──
+function buildKeyboard() {
+  keyboard.innerHTML = '';
+
+  if (emojiMode) {
+    for (let i = 0; i < emojis.length; i += 10) {
+      const row = document.createElement('div');
+      row.className = 'row';
+      emojis.slice(i, i + 10).forEach(e => {
+        const btn = makeKey(e, () => { insertText(e); vibrate(15); playClick(); });
+        btn.style.fontSize = '20px';
+        row.appendChild(btn);
+      });
+      keyboard.appendChild(row);
+    }
+  } else if (numberMode) {
+    numbers.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      r.forEach(k => {
+        const btn = makeKey(k, () => { insertText(k); vibrate(18); playClick(); });
+        row.appendChild(btn);
+      });
+      keyboard.appendChild(row);
+    });
+  } else {
+    const currentLayout = layouts[layout];
+    currentLayout.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      r.forEach(k => {
+        const value = caps ? k.toUpperCase() : k;
+        const btn = makeKey(value, () => { insertText(value); vibrate(18); playClick(); });
+        row.appendChild(btn);
+      });
+      keyboard.appendChild(row);
+    });
+
+    // French special characters row
+    const frRow = document.createElement('div');
+    frRow.className = 'row';
+    frRow.style.flexWrap = 'wrap';
+    frRow.style.justifyContent = 'center';
+    frRow.style.gap = '3px';
+    frenchExtra.forEach(k => {
+      const value = caps ? k.toUpperCase() : k;
+      const btn = makeKey(value, () => { insertText(value); vibrate(15); playClick(); });
+      btn.style.minWidth = '26px';
+      btn.style.maxWidth = '32px';
+      btn.style.height = '34px';
+      btn.style.fontSize = '14px';
+      frRow.appendChild(btn);
+    });
+    keyboard.appendChild(frRow);
+  }
+
+  // ── BOTTOM ROW ──
+  const bottomRow = document.createElement('div');
+  bottomRow.className = 'row';
+
+  const shiftBtn = makeKey('⇧', () => { toggleCaps(); vibrate(20); playClick('special'); });
+  shiftBtn.className += ' key-special key-shift';
+  shiftBtn.style.maxWidth = '52px';
+  if (caps) shiftBtn.classList.add('active');
+
+  const numBtn = makeKey(numberMode ? 'ABC' : '?123', () => { toggleNumbers(); vibrate(20); playClick('special'); });
+  numBtn.className += ' key-special key-num';
+  numBtn.style.maxWidth = '52px';
+  numBtn.style.fontSize = '10px';
+  if (numberMode) numBtn.classList.add('active');
+
+  const spaceBtn = makeKey('· · · · ·', () => { insertText(' '); vibrate(15); playClick(); });
+  spaceBtn.className += ' key-space';
+  spaceBtn.style.flex = '4';
+  spaceBtn.style.maxWidth = 'none';
+
+  const emojiBtn = makeKey('😊', () => { toggleEmoji(); vibrate(15); playClick('special'); });
+  emojiBtn.className += ' key-emoji';
+  emojiBtn.style.maxWidth = '42px';
+  emojiBtn.style.fontSize = '17px';
+  if (emojiMode) emojiBtn.classList.add('active');
+
+  const enterBtn = makeKey('↵', () => { insertText('\n'); vibrate(20); playClick('special'); });
+  enterBtn.className += ' key-enter';
+  enterBtn.style.maxWidth = '50px';
+
+  const delBtn = makeKey('⌫', null);
+  delBtn.className += ' key-delete';
+  delBtn.style.maxWidth = '50px';
+
+  function startDeleting() {
+    doBackspace(); vibrate(25); playClick('delete');
+    holdDeleteTimer = setTimeout(() => {
+      holdDeleteInterval = setInterval(() => { doBackspace(); vibrate(12); }, 50);
+    }, 400);
+  }
+  function stopDeleting() {
+    clearTimeout(holdDeleteTimer);
+    clearInterval(holdDeleteInterval);
+  }
+  delBtn.addEventListener('mousedown', startDeleting);
+  delBtn.addEventListener('touchstart', startDeleting, { passive: true });
+  delBtn.addEventListener('mouseup', stopDeleting);
+  delBtn.addEventListener('mouseleave', stopDeleting);
+  delBtn.addEventListener('touchend', stopDeleting);
+
+  bottomRow.append(shiftBtn, numBtn, spaceBtn, emojiBtn, delBtn, enterBtn);
+  keyboard.appendChild(bottomRow);
+
+  if (rgb) applyRGBToKeys();
+  updateModeDots();
+}
+
+function makeKey(label, action) {
+  const btn = document.createElement('button');
+  btn.className = 'key';
+  btn.textContent = label;
+  if (action) {
+    btn.addEventListener('click', function(e) {
+      addRipple(btn, e);
+      action();
+    });
+  }
+  return btn;
+}
+
+// ── TOGGLES ──
+function toggleCaps() {
+  caps = !caps;
+  document.getElementById('btnCaps').classList.toggle('active', caps);
+  buildKeyboard();
+}
+
+function toggleLayout() {
+  layout = layout === 'qwerty' ? 'azerty' : 'qwerty';
+  const btn = document.getElementById('btnLayout');
+  btn.textContent = layout === 'qwerty' ? 'AZERTY' : 'QWERTY';
+  showToast('LAYOUT: ' + layout.toUpperCase());
+  buildKeyboard();
+}
+
+function toggleEmoji() {
+  emojiMode = !emojiMode;
+  if (emojiMode) numberMode = false;
+  document.getElementById('btnEmoji').classList.toggle('active2', emojiMode);
+  buildKeyboard();
+}
+
+function toggleNumbers() {
+  numberMode = !numberMode;
+  if (numberMode) emojiMode = false;
+  document.getElementById('btnNum').classList.toggle('active', numberMode);
+  buildKeyboard();
+}
+
+function updateModeDots() {
+  document.getElementById('dot-alpha').classList.toggle('active', !numberMode && !emojiMode);
+  document.getElementById('dot-num').classList.toggle('active', numberMode);
+  document.getElementById('dot-emoji').classList.toggle('active2', emojiMode);
+  document.getElementById('modeLabel').textContent = emojiMode ? 'EMOJI' : numberMode ? 'SYMBOLS' : 'ALPHA';
+}
+
+// ── RGB MODE (smooth CSS animation, no heavy JS interval) ──
+function toggleRGB() {
+  rgb = !rgb;
+  document.getElementById('btnRGB').classList.toggle('active', rgb);
+  if (rgb) {
+    applyRGBToKeys();
+    showToast('🌈 RGB ON');
+  } else {
+    clearRGB();
+    showToast('RGB OFF');
+  }
+}
+
+function applyRGBToKeys() {
+  document.querySelectorAll('.key').forEach((k, i) => {
+    k.classList.add('rgb-key');
+    // stagger the animation delay per key for a wave effect
+    k.style.setProperty('--rgb-delay', `${(i * 0.06) % 3}s`);
+  });
+}
+
+function clearRGB() {
+  document.querySelectorAll('.key').forEach(k => {
+    k.classList.remove('rgb-key');
+    k.style.removeProperty('--rgb-delay');
+    k.style.borderColor = '';
+    k.style.boxShadow = '';
+  });
+}
+
+// ── UTILS ──
+function copyText() {
+  if (!output.value) return showToast('RIEN À COPIER');
+  navigator.clipboard.writeText(output.value)
+    .then(() => showToast('📋 COPIÉ!'))
+    .catch(() => { output.select(); document.execCommand('copy'); showToast('📋 COPIÉ!'); });
+  vibrate(30);
+}
+
+function sendText() {
+  if (!output.value.trim()) return showToast('⚠ RIEN À ENVOYER');
+  const text = output.value.trim();
+  vibrate(60);
+  const ow = document.querySelector('.output-wrapper');
+  ow.style.boxShadow = '0 0 30px #00f5ffaa, 0 0 60px #00f5ff44';
+  ow.style.borderColor = '#00f5ff';
+  setTimeout(() => { ow.style.boxShadow = ''; ow.style.borderColor = ''; }, 600);
+  if (window.AndroidKeyboard) {
+    const pkg = AndroidKeyboard.getPackageName();
+    if (pkg.includes("claude") || pkg.includes("anthropic")) {
+      showToast('✅ Appuie sur ➤ pour envoyer');
+    } else {
+      AndroidKeyboard.performEditorAction();
+      showToast('🚀 ENVOYÉ!');
+    }
+    output.value = '';
+    suggestions.innerHTML = '';
+    updateStats();
+  } else {
+    navigator.clipboard.writeText(text)
+      .then(() => { showToast('📋 COPIÉ!'); output.value = ''; suggestions.innerHTML = ''; updateStats(); })
+      .catch(() => showToast('❌ ERREUR'));
+  }
+}
+
+function clearText() {
+  if (!output.value) return;
+  output.value = '';
+  suggestions.innerHTML = '';
+  updateStats();
+  showToast('🗑 EFFACÉ');
+  vibrate(25);
+}
+
+const translations = {
+  bonjour:'hello', merci:'thanks', maison:'house', clavier:'keyboard',
+  ordinateur:'computer', salut:'hi', oui:'yes', non:'no', amour:'love',
+  beau:'beautiful', grand:'big', petit:'small', vite:'fast', lent:'slow'
+};
+
+function translateWord() {
+  const words = output.value.trim().split(/\s+/);
+  const last = words[words.length - 1].toLowerCase();
+  const tr = translations[last];
+  if (tr) {
+    output.value += ` → ${tr}`;
+    showToast(`${last} → ${tr}`);
+  } else {
+    showToast('MOT INCONNU');
+  }
+  updateStats();
+}
+
+// ── VOICE (fixed: proper permission + state mgmt) ──
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return showToast('❌ MICRO NON SUPPORTÉ');
+  const btn = document.getElementById('btnVoice');
+
+  if (btn._recognition) {
+    try { btn._recognition.stop(); } catch(e) {}
+    btn._recognition = null;
+    btn.classList.remove('active');
+    btn.textContent = '🎤 VOICE';
+    showToast('🎤 ARRÊTÉ');
+    return;
+  }
+
+  // Request mic permission explicitly
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(() => {
+      const r = new SR();
+      btn._recognition = r;
+      r.lang = 'fr-FR';
+      r.continuous = false;
+      r.interimResults = false;
+      r.maxAlternatives = 1;
+
+      btn.classList.add('active');
+      btn.textContent = '🔴 ÉCOUTE…';
+      showToast('🎤 PARLEZ…');
+      vibrate(30);
+
+      r.onresult = function(e) {
+        const text = e.results[0][0].transcript;
+        insertText(text + ' ');
+        showToast('🎤 ' + text.substring(0, 25));
+      };
+      r.onend = function() {
+        btn._recognition = null;
+        btn.classList.remove('active');
+        btn.textContent = '🎤 VOICE';
+      };
+      r.onerror = function(ev) {
+        btn._recognition = null;
+        btn.classList.remove('active');
+        btn.textContent = '🎤 VOICE';
+        if (ev.error === 'not-allowed') showToast('❌ MICRO REFUSÉ');
+        else if (ev.error === 'no-speech') showToast('⚠ AUCUNE VOIX');
+        else showToast('ERR: ' + ev.error);
+      };
+      try { r.start(); } catch(e) {
+        btn._recognition = null;
+        btn.classList.remove('active');
+        btn.textContent = '🎤 VOICE';
+        showToast('❌ DÉMARRAGE ÉCHOUÉ');
+      }
+    })
+    .catch(() => showToast('❌ PERMISSION MICRO REFUSÉE'));
+}
+
+// ── FAKE AI ──
+const aiResponses = {
+  bonjour: '👋 Salut! Je suis ALI KEYBOARD, ton clavier IA.',
+  merci: '🤖 De rien! C\'est mon rôle.',
+  aide: '💡 Tape, traduis, utilise la voix... tout est là!',
+  hello: '🤖 Hello human! ALI KEYBOARD online.',
+  test: '✅ Système opérationnel. Tous les modules actifs.',
+  cool: '🔥 Merci! Développé avec ❤️ et beaucoup de café.',
+};
+
+function fakeAI() {
+  const text = output.value.trim().toLowerCase();
+  let response = '🤖 ALI KEYBOARD ULTRA — Système actif. Tape quelque chose!';
+  for (const [key, val] of Object.entries(aiResponses)) {
+    if (text.includes(key)) { response = val; break; }
+  }
+  output.value += '\n' + response + '\n';
+  output.scrollTop = output.scrollHeight;
+  updateStats();
+  showToast('🤖 IA RÉPOND…');
+  vibrate(40);
+}
+
+// ── TOAST ──
+let toastTimer = null;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
+}
+
+// ── BG UPLOAD (fixed) ──
+document.getElementById('bgUpload').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    document.body.style.backgroundImage = `url(${ev.target.result})`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.classList.add('has-bg');
+    showToast('🖼 BACKGROUND APPLIQUÉ');
+  };
+  reader.readAsDataURL(file);
+  this.value = ''; // reset so same file can be re-selected
+});
+
+// ── KEYBOARD SHORTCUTS (physical keyboard) ──
+document.addEventListener('keydown', function(e) {
+  if (e.target === output) return;
+  if (e.ctrlKey && e.key === 'c') copyText();
+  if (e.ctrlKey && e.key === 'Delete') clearText();
+});
+
+// ── OUTPUT EVENTS ──
+output.addEventListener('input', function() { showSuggestions(); updateStats(); });
+output.addEventListener('keyup', showSuggestions);
+
+// ── INIT ──
+applyTheme('cyber');
+buildKeyboard();
+updateStats();
+
+const statuses = ['● ONLINE', '● READY', '● ALI v4.0'];
+let si = 0;
+setInterval(() => {
+  document.getElementById('statusLabel').textContent = statuses[si % statuses.length];
+  si++;
+}, 3000);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+</body>
+</html>
