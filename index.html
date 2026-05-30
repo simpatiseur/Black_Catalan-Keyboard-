@@ -343,16 +343,16 @@ body.has-bg .options-panel { background: rgba(13,17,23,0.93); backdrop-filter: b
 
   <div class="panel-section">
     <div class="panel-section-title">THÈME</div>
-    <select class="panel-theme-select" id="themeSelector">
-      <option value="cyber">⚡ CYBER</option>
-      <option value="matrix">🟢 MATRIX</option>
-      <option value="fire">🔥 FIRE</option>
-      <option value="purple">💜 NEBULA</option>
-      <option value="gold">✨ GOLD</option>
-      <option value="ice">❄️ ICE</option>
-      <option value="rose">🌸 ROSE</option>
-      <option value="emerald">💚 EMERALD</option>
-    </select>
+    <div class="panel-grid" id="themeGrid">
+  <button class="panel-btn" onclick="setTheme('cyber',this)">⚡ CYBER</button>
+  <button class="panel-btn" onclick="setTheme('matrix',this)">🟢 MATRIX</button>
+  <button class="panel-btn" onclick="setTheme('fire',this)">🔥 FIRE</button>
+  <button class="panel-btn" onclick="setTheme('purple',this)">💜 NEBULA</button>
+  <button class="panel-btn" onclick="setTheme('gold',this)">✨ GOLD</button>
+  <button class="panel-btn" onclick="setTheme('ice',this)">❄️ ICE</button>
+  <button class="panel-btn" onclick="setTheme('rose',this)">🌸 ROSE</button>
+  <button class="panel-btn" onclick="setTheme('emerald',this)">💚 EMERALD</button>
+    </div>
   </div>
 
   <div class="panel-section">
@@ -534,10 +534,7 @@ function applyTheme(name) {
   try { localStorage.setItem('ali_theme', name); } catch(e) {}
 }
 
-document.getElementById('themeSelector').addEventListener('change', function() {
-  applyTheme(this.value);
-  showToast('THÈME: ' + this.options[this.selectedIndex].text.split(' ').pop());
-});
+
 
 // ── AUDIO ──
 let audioCtx = null;
