@@ -1011,11 +1011,13 @@ function sendText() {
 
   // Envoie le texte directement dans le champ actif via le bridge Android
 if (window.AndroidKeyboard) {
-  setTimeout(() => {
+  const pkg = AndroidKeyboard.getPackageName();
+  if (pkg.includes("claude") || pkg.includes("anthropic")) {
+    showToast('✅ Appuie sur ➤ pour envoyer');
+  } else {
     AndroidKeyboard.performEditorAction();
-    AndroidKeyboard.sendKey(66);
-  }, 150);
-  showToast('🚀 ENVOYÉ!');
+    showToast('🚀 ENVOYÉ!');
+  }
   output.value = '';
   suggestions.innerHTML = '';
   updateStats();
