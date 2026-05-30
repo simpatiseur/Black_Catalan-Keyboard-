@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<title>ALI KEYBOARD — ULTRA</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #030712;
+  --surface: #0d1117;
+  --key: #111827;
+  --key-border: #1f2937;
+  --accent: #00f5ff;
+  --accent2: #ff00ff;
+  --text: #e2e8f0;
+  --glow: 0 0 12px #00f5ff66, 0 0 30px #00f5ff22;
+  --glow2: 0 0 12px #ff00ff66, 0 0 30px #ff00ff22;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Orbitron', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+html, body {
+  width: 100%; min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, #00f5ff0a 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, #ff00ff08 0%, transparent 60%);
+  transition: background-color 0.5s;
+}
+
+body::before {
+  content:''; position:fixed; inset:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, #00000018 2px, #00000018 4px);
+  pointer-events:none; z-index:9999;
+}
+body::after {
+  content:''; position:fixed; inset:0;
+  background-image: linear-gradient(#00f5ff08 1px, transparent 1px), linear-gradient(90deg, #00f5ff08 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none; z-index:0;
+}
+
+/* ── PANEL OVERLAY ── */
+.panel-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0);
+  z-index: 4000;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+.panel-overlay.open { background: rgba(0,0,0,0.6); pointer-events: all; }
+
+/* ── SLIDE PANEL ── */
+.options-panel {
+  position: fixed;
+  top: 0; right: -110%;
+  width: min(300px, 86vw);
+  height: 100%;
+  background: var(--surface);
+  border-left: 1px solid var(--key-border);
+  z-index: 4001;
+  display: flex; flex-direction: column;
+  transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+  overflow-y: auto; scrollbar-width: none;
+  box-shadow: -8px 0 40px #00000066;
+}
+.options-panel::-webkit-scrollbar { display: none; }
+.options-panel.open { right: 0; }
+
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--key-border);
+  position: sticky; top: 0;
+  background: var(--surface); z-index: 1;
+}
+.panel-title { font-family: var(--font-display); font-size: 12px; color: var(--accent); letter-spacing: 3px; }
+.panel-close {
+  width: 30px; height: 30px;
+  border: 1px solid var(--key-border); border-radius: 8px;
+  background: var(--key); color: var(--text); font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.panel-close:active { border-color: var(--accent2); color: var(--accent2); }
+
+.panel-section { padding: 10px 12px; border-bottom: 1px solid #ffffff08; }
+.panel-section-title { font-size: 9px; letter-spacing: 3px; color: var(--accent); opacity: 0.55; margin-bottom: 8px; font-family: var(--font-display); }
+
+.panel-theme-select {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--key-border); border-radius: 10px;
+  background: var(--key); color: var(--text);
+  font-family: var(--font-mono); font-size: 14px; cursor: pointer; letter-spacing: 1px;
+  -webkit-appearance: none; appearance: none;
+}
+.panel-theme-select:focus { outline: none; border-color: var(--accent); }
+
+.panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+.panel-btn {
+  padding: 11px 8px;
+  border: 1px solid var(--key-border); border-radius: 10px;
+  background: var(--key); color: var(--text);
+  font-family: var(--font-mono); font-size: 13px;
+  cursor: pointer; letter-spacing: 1px; text-align: center;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.08s;
+  white-space: nowrap;
+}
+.panel-btn:active { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); transform: scale(0.95); }
+.panel-btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: var(--glow); font-weight: bold; }
+.panel-btn.active2 { background: var(--accent2); color: #000; border-color: var(--accent2); box-shadow: var(--glow2); font-weight: bold; }
+.panel-btn.send-btn {
+  grid-column: 1/-1;
+  background: linear-gradient(135deg,#00f5ff,#0080ff);
+  color: #000; font-weight: bold; border-color: #00f5ff;
+  font-size: 15px; padding: 13px;
+}
+.panel-btn.send-btn:active { transform: scale(0.97); }
+.panel-bg-label {
+  padding: 11px 8px;
+  border: 1px solid var(--key-border); border-radius: 10px;
+  background: var(--key); color: var(--text);
+  font-family: var(--font-mono); font-size: 13px;
+  cursor: pointer; letter-spacing: 1px; text-align: center;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.panel-bg-label:active { border-color: var(--accent); color: var(--accent); }
+
+/* ── MENU BTN ── */
+.menu-btn {
+  width: 34px; height: 34px;
+  border: 1px solid var(--key-border); border-radius: 9px;
+  background: var(--key); color: var(--accent);
+  font-size: 17px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.menu-btn:active { border-color: var(--accent); box-shadow: var(--glow); transform: scale(0.93); }
+
+/* ── WRAPPER ── */
+.wrapper {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 6px;
+  display: flex; flex-direction: column; gap: 5px;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+.logo { font-family: var(--font-display); font-size: clamp(14px,4vw,22px); font-weight: 900; color: var(--accent); text-shadow: var(--glow); letter-spacing: 4px; }
+.logo span { color: var(--accent2); text-shadow: var(--glow2); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.status { font-size: 10px; color: #00f5ff88; letter-spacing: 2px; animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── OUTPUT ── */
+.output-wrapper {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--key-border);
+  border-radius: 16px; overflow: hidden;
+  transition: background 0.5s, border-color 0.5s;
+}
+.output-wrapper::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  background-size: 200% 100%;
+  animation: scanline 3s linear infinite;
+}
+@keyframes scanline { 0%{background-position:0%} 100%{background-position:200%} }
+.output-label { font-family: var(--font-display); font-size: 9px; letter-spacing: 3px; color: var(--accent); padding: 5px 10px 0; opacity:.7; }
+
+textarea {
+  width: 100%; min-height: 65px; max-height: 120px;
+  border: none; outline: none; background: transparent;
+  color: var(--text); font-family: var(--font-mono);
+  font-size: 19px; resize: none;
+  padding: 8px 12px 10px; line-height: 1.6;
+  caret-color: var(--accent);
+}
+.output-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2px 10px 5px; font-size: 9px; color: #ffffff33; letter-spacing: 1px;
+}
+
+/* ── SUGGESTIONS ── */
+.suggestions {
+  display: flex; gap: 6px; overflow-x: auto;
+  padding: 2px 0; scrollbar-width: none; min-height: 34px;
+  flex-shrink: 0;
+}
+.suggestions::-webkit-scrollbar { display:none; }
+.sug-item {
+  padding: 6px 12px;
+  background: var(--surface); border: 1px solid var(--accent);
+  border-radius: 20px; font-family: var(--font-mono);
+  font-size: 13px; color: var(--accent); white-space: nowrap;
+  cursor: pointer; transition: all .1s; letter-spacing: 1px;
+  animation: fadeIn .15s ease; flex-shrink: 0;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
+.sug-item:active { background: var(--accent); color: #000; box-shadow: var(--glow); }
+
+/* ── KEYBOARD ── */
+.keyboard-container {
+  background: var(--surface); border: 1px solid var(--key-border);
+  border-radius: 16px; padding: 6px;
+  position: relative; overflow: hidden;
+  transition: background 0.5s, border-color 0.5s;
+}
+.keyboard-container::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+}
+.keyboard { display: flex; flex-direction: column; gap: 4px; }
+.row { display: flex; gap: 3px; justify-content: center; }
+
+/* Accents row */
+.accents-row {
+  display: flex; gap: 3px; overflow-x: auto;
+  scrollbar-width: none; padding-bottom: 3px; flex-shrink: 0;
+}
+.accents-row::-webkit-scrollbar { display: none; }
+
+/* Keys */
+.key {
+  flex: 1; min-width: 26px; max-width: 60px;
+  height: 40px;
+  border: 1px solid var(--key-border); border-radius: 9px;
+  background: var(--key); color: var(--text);
+  font-family: var(--font-mono); font-size: 18px;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: border-color 0.08s, box-shadow 0.08s, transform 0.07s, background 0.5s;
+  user-select: none; will-change: transform;
+}
+.key::after {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(180deg,#ffffff0a 0%,transparent 100%);
+  border-radius: inherit; pointer-events:none;
+}
+.key:active, .key.pressed {
+  transform: scale(.92) translateY(1px);
+  background: #1e293b;
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+/* Ripple */
+.ripple {
+  position: absolute; border-radius: 50%;
+  background: var(--accent); opacity: .28;
+  transform: scale(0);
+  animation: ripple-anim 0.45s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
+
+/* Special keys */
+.key-special {
+  background: linear-gradient(135deg,#1a2744,#0f172a);
+  border-color: var(--accent); color: var(--accent);
+  font-family: var(--font-display); font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; max-width: none;
+}
+.key-special:active { box-shadow: var(--glow); }
+
+.key-delete {
+  background: linear-gradient(135deg,#3d0a0a,#1a0a0a);
+  border-color: #ff444455; color: #ff6666;
+}
+.key-delete:active { border-color: #ff4444; box-shadow: 0 0 12px #ff444466; }
+
+.key-space { flex: 4; max-width: none; font-size: 10px; letter-spacing: 3px; color: #ffffff33; }
+.key-enter { background: linear-gradient(135deg,#003d3d,#001a1a); border-color: var(--accent); color: var(--accent); max-width: none; }
+
+.key-accent {
+  background: linear-gradient(135deg,#1a1040,#0f0820);
+  border-color: var(--accent2); color: var(--accent2);
+  font-size: 17px; min-width: 34px; max-width: 42px; flex: 0 0 auto;
+}
+.key-accent:active { box-shadow: var(--glow2); border-color: var(--accent2); }
+
+.key-shift.active, .key-num.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: var(--glow); }
+.key-emoji.active { background: var(--accent2); color: #000; border-color: var(--accent2); box-shadow: var(--glow2); }
+
+/* ── ARROWS ── */
+.arrow-section { display: flex; justify-content: center; margin-top: 3px; }
+.arrow-grid { display: grid; grid-template-columns: repeat(3,38px); grid-template-rows: repeat(2,34px); gap: 4px; }
+.arrow-grid .key { min-width: unset; width: 38px; height: 34px; font-size: 13px; max-width: none; flex: none; }
+.arrow-grid .key-blank { background: transparent; border-color: transparent; pointer-events: none; }
+
+/* ── MODE BAR ── */
+.mode-bar { display: flex; gap: 6px; align-items: center; justify-content: center; padding: 2px 0 1px; }
+.mode-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--key-border); transition: background .25s, box-shadow .25s; }
+.mode-dot.active { background: var(--accent); box-shadow: var(--glow); }
+.mode-dot.active2 { background: var(--accent2); box-shadow: var(--glow2); }
+.mode-label { font-size: 10px; color: #ffffff33; letter-spacing: 2px; font-family: var(--font-display); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface); border: 1px solid var(--accent);
+  color: var(--accent); padding: 10px 22px; border-radius: 30px;
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 2px;
+  box-shadow: var(--glow); transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index: 10000; white-space: nowrap;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── BG ── */
+body.has-bg { background-attachment: fixed; background-size: cover; background-position: center; }
+body.has-bg .keyboard-container, body.has-bg .output-wrapper { background: rgba(0,0,0,.65); backdrop-filter: blur(18px); }
+body.has-bg .options-panel { background: rgba(13,17,23,0.93); backdrop-filter: blur(20px); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 380px) { .key { height: 36px; font-size: 16px; } .row { gap: 2px; } }
+@media (min-width: 600px) { .key { height: 44px; font-size: 19px; } .row { gap: 5px; } }
+</style>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+<!-- OPTIONS PANEL -->
+<div class="options-panel" id="optionsPanel">
+  <div class="panel-header">
+    <div class="panel-title">⚙ OPTIONS</div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">THÈME</div>
+    <div class="panel-grid" id="themeGrid">
+  <button class="panel-btn" onclick="setTheme('cyber',this)">⚡ CYBER</button>
+  <button class="panel-btn" onclick="setTheme('matrix',this)">🟢 MATRIX</button>
+  <button class="panel-btn" onclick="setTheme('fire',this)">🔥 FIRE</button>
+  <button class="panel-btn" onclick="setTheme('purple',this)">💜 NEBULA</button>
+  <button class="panel-btn" onclick="setTheme('gold',this)">✨ GOLD</button>
+  <button class="panel-btn" onclick="setTheme('ice',this)">❄️ ICE</button>
+  <button class="panel-btn" onclick="setTheme('rose',this)">🌸 ROSE</button>
+  <button class="panel-btn" onclick="setTheme('emerald',this)">💚 EMERALD</button>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">CLAVIER</div>
+    <div class="panel-grid">
+      <button class="panel-btn" id="btnLayout" onclick="toggleLayout()">🔤 AZERTY</button>
+      <button class="panel-btn" id="btnCaps" onclick="toggleCaps()">⇧ CAPS</button>
+      <button class="panel-btn" id="btnNum" onclick="toggleNumbers()">123 NUM</button>
+      <button class="panel-btn" id="btnEmoji" onclick="toggleEmoji()">😊 EMOJI</button>
+      <button class="panel-btn" id="btnRGB" onclick="toggleRGB()">🌈 RGB</button>
+      <button class="panel-btn" id="btnSound" onclick="toggleSound()">🔊 SON</button>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">ACTIONS</div>
+    <div class="panel-grid">
+      <button class="panel-btn" onclick="copyText();closePanel()">📋 COPY</button>
+      <button class="panel-btn" onclick="clearText();closePanel()">🗑 CLEAR</button>
+      <button class="panel-btn" id="btnVoice" onclick="startVoice()">🎤 VOICE</button>
+      <button class="panel-btn" onclick="translateWord();closePanel()">🌍 TRAD</button>
+      <button class="panel-btn" onclick="fakeAI();closePanel()">🤖 AI</button>
+      <label class="panel-bg-label" for="bgUpload">🖼 FOND</label>
+      <input type="file" id="bgUpload" accept="image/*" style="display:none">
+      <button class="panel-btn" onclick="removeBg();closePanel()">🚫 NO BG</button>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">ENVOYER</div>
+    <div class="panel-grid">
+      <button class="panel-btn send-btn" onclick="sendText();closePanel()">🚀 SEND</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">ALI <span>KEY</span>BOARD</div>
+    <div class="header-right">
+  <div class="status" id="statusLabel">● ONLINE</div>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="output-wrapper">
+    <div class="output-label">OUTPUT TERMINAL</div>
+    <textarea id="output" placeholder="// Tape ici..." spellcheck="true" autocomplete="on" autocorrect="on" autocapitalize="sentences"></textarea>
+    <div class="output-footer">
+      <span id="charCount">0 chars</span>
+      <span id="wordCount">0 words</span>
+      <span id="lineCount">1 line</span>
+    </div>
+  </div>
+
+  <!-- SUGGESTIONS -->
+  <div class="suggestions" id="suggestions"></div>
+
+  <!-- MODE BAR -->
+  <div class="mode-bar">
+    <div class="mode-dot active" id="dot-alpha"></div>
+    <div class="mode-dot" id="dot-num"></div>
+    <div class="mode-dot" id="dot-emoji"></div>
+    <span class="mode-label" id="modeLabel">ALPHA</span>
+  </div>
+
+  <!-- KEYBOARD -->
+  <div class="keyboard-container">
+    <div class="accents-row" id="accentsRow"></div>
+    <div class="keyboard" id="keyboard"></div>
+    <div class="arrow-section">
+      <div class="arrow-grid">
+        <button class="key key-blank"></button>
+        <button class="key key-special" onclick="moveCursor('up')">▲</button>
+        <button class="key key-blank"></button>
+        <button class="key key-special" onclick="moveCursor('left')">◀</button>
+        <button class="key key-special" onclick="moveCursor('down')">▼</button>
+        <button class="key key-special" onclick="moveCursor('right')">▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ──
+const output = document.getElementById('output');
+const keyboard = document.getElementById('keyboard');
+const suggestions = document.getElementById('suggestions');
+const accentsRow = document.getElementById('accentsRow');
+
+let caps = false, emojiMode = false, numberMode = false;
+let layout = 'qwerty', rgb = false, rgbRaf = null;
+let soundEnabled = true;
+let holdDeleteTimer = null, holdDeleteInterval = null;
+let rgbHue = 0;
+
+let savedWords = [];
+try { savedWords = JSON.parse(localStorage.getItem('ali_words') || '[]'); } catch(e) {}
+
+// ── PANEL ──
+function openPanel() {
+  document.getElementById('optionsPanel').classList.add('open');
+  document.getElementById('panelOverlay').classList.add('open');
+}
+function closePanel() {
+  document.getElementById('optionsPanel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('open');
+}
+// Swipe right to close
+let px0 = 0, swipeStartX = 0, swipeStartY = 0;
+
+// Swipe droite dans le panel → ferme
+document.getElementById('optionsPanel').addEventListener('touchstart', e => { px0 = e.touches[0].clientX; }, {passive:true});
+document.getElementById('optionsPanel').addEventListener('touchend', e => { if (e.changedTouches[0].clientX - px0 > 55) closePanel(); }, {passive:true});
+
+// Swipe gauche sur l'écran → ouvre le panel
+document.addEventListener('touchstart', e => {
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+}, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - swipeStartX;
+  const dy = Math.abs(e.changedTouches[0].clientY - swipeStartY);
+  if (dx < -60 && dy < 40) openPanel();
+}, {passive:true});
+
+// ── LAYOUTS ──
+const layouts = {
+  qwerty: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m']],
+  azerty: [['a','z','e','r','t','y','u','i','o','p'],['q','s','d','f','g','h','j','k','l','m'],['w','x','c','v','b','n']]
+};
+
+const accentsLower = ['ç','é','è','ê','ë','à','â','ä','î','ï','ô','ö','ù','û','ü','œ','æ','ñ','€','«','»','…','–','—'];
+const accentsUpper = ['Ç','É','È','Ê','Ë','À','Â','Ä','Î','Ï','Ô','Ö','Ù','Û','Ü','Œ','Æ','Ñ','€','«','»','…','–','—'];
+
+const numbers = [
+  ['1','2','3','4','5','6','7','8','9','0'],
+  ['!','@','#','$','%','^','&','*','(',')'],
+  ['-','_','=','+','[',']','{','}','\\','|'],
+  [';',':','\'','"',',','.','<','>','/','?'],
+  ['€','£','¥','₩','₿','©','®','™','°','~']
+];
+
+const emojis = [
+  '😀','😂','🤣','😍','😘','😎','🥵','😭','😤','🤖',
+  '❤️','🧡','💛','💚','💙','💜','🖤','🤍','💔','✨',
+  '🔥','⚡','💯','🎉','🎊','🚀','💎','👑','🏆','🎮',
+  '👍','👎','👋','🤝','🙏','💪','🫶','✌️','🤞','👀',
+  '🌈','🌙','⭐','🌟','💫','🌊','🍀','🦋','🐉','🦄'
+];
+
+// ── THEMES ──
+const themes = {
+  cyber:   {bg:'#030712',surface:'#0d1117',key:'#111827',border:'#1f2937',accent:'#00f5ff',accent2:'#ff00ff'},
+  matrix:  {bg:'#000a00',surface:'#001400',key:'#001a00',border:'#003300',accent:'#00ff41',accent2:'#00cc33'},
+  fire:    {bg:'#0a0000',surface:'#1a0000',key:'#2a0000',border:'#440000',accent:'#ff6600',accent2:'#ff0000'},
+  purple:  {bg:'#0a0014',surface:'#13001f',key:'#1a002e',border:'#2d0050',accent:'#bf00ff',accent2:'#7c3aed'},
+  gold:    {bg:'#0a0800',surface:'#1a1400',key:'#2a2000',border:'#443300',accent:'#ffd700',accent2:'#ffaa00'},
+  ice:     {bg:'#000a1a',surface:'#001428',key:'#001e38',border:'#003355',accent:'#88ddff',accent2:'#00aaff'},
+  rose:    {bg:'#120008',surface:'#1f0010',key:'#2e0018',border:'#500030',accent:'#ff6eb4',accent2:'#ff1493'},
+  emerald: {bg:'#001208',surface:'#001a0e',key:'#002214',border:'#003d22',accent:'#00e676',accent2:'#00bfa5'}
+};
+
+function applyTheme(name) {
+  const t = themes[name] || themes.cyber;
+  const r = document.documentElement.style;
+  r.setProperty('--bg', t.bg);
+  r.setProperty('--surface', t.surface);
+  r.setProperty('--key', t.key);
+  r.setProperty('--key-border', t.border);
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--accent2', t.accent2);
+  r.setProperty('--glow', `0 0 12px ${t.accent}66, 0 0 30px ${t.accent}22`);
+  r.setProperty('--glow2', `0 0 12px ${t.accent2}66, 0 0 30px ${t.accent2}22`);
+  document.body.style.backgroundColor = t.bg;
+  try { localStorage.setItem('ali_theme', name); } catch(e) {}
+}
+  function setTheme(name, btn) {
+  applyTheme(name);
+  document.querySelectorAll('#themeGrid .panel-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  showToast('THÈME: ' + name.toUpperCase());
+  }
+
+
+
+// ── AUDIO ──
+let audioCtx = null;
+function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+function playClick(type) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx(); if (ctx.state === 'suspended') ctx.resume();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type === 'delete') { osc.frequency.value = 200; gain.gain.value = 0.05; }
+    else if (type === 'special') { osc.frequency.value = 800; gain.gain.value = 0.05; }
+    else { osc.frequency.value = 600 + Math.random()*120; gain.gain.value = 0.04; }
+    osc.type = 'sine'; osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
+    osc.stop(ctx.currentTime + 0.06);
+  } catch(e) {}
+}
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('btnSound').textContent = soundEnabled ? '🔊 SON' : '🔇 SON';
+  document.getElementById('btnSound').classList.toggle('active', !soundEnabled);
+  showToast(soundEnabled ? 'SON ACTIVÉ' : 'SON DÉSACTIVÉ');
+}
+
+// ── VIBRATION ──
+function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms||15); } catch(e) {} }
+
+// ── RIPPLE ──
+function addRipple(btn, e) {
+  const rect = btn.getBoundingClientRect();
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+  const rp = document.createElement('span');
+  rp.className = 'ripple';
+  rp.style.cssText = `width:${rect.width}px;height:${rect.width}px;left:${x-rect.width/2}px;top:${y-rect.width/2}px`;
+  btn.appendChild(rp);
+  setTimeout(() => rp.remove(), 450);
+}
+
+// ── INSERT TEXT ──
+function insertText(text) {
+  if (window.AndroidKeyboard) AndroidKeyboard.sendText(text);
+  const s = output.selectionStart, e2 = output.selectionEnd;
+  output.value = output.value.substring(0,s) + text + output.value.substring(e2);
+  const pos = s + text.length;
+  output.selectionStart = output.selectionEnd = pos;
+  output.focus();
+   saveWord(text); showSuggestions(); updateStats();
+}
+
+// ── BACKSPACE ──
+function doBackspace() {
+  if (window.AndroidKeyboard) AndroidKeyboard.sendBackspace();
+  const s = output.selectionStart, e2 = output.selectionEnd;
+  if (s !== e2) { output.value = output.value.substring(0,s)+output.value.substring(e2); output.selectionStart=output.selectionEnd=s; }
+  else if (s > 0) { output.value = output.value.substring(0,s-1)+output.value.substring(s); output.selectionStart=output.selectionEnd=s-1; }
+  output.focus(); showSuggestions(); updateStats();
+}
+
+// ── STATS ──
+function updateStats() {
+  const v = output.value;
+  document.getElementById('charCount').textContent = v.length+' chars';
+  document.getElementById('wordCount').textContent = (v.trim()?v.trim().split(/\s+/).length:0)+' words';
+  document.getElementById('lineCount').textContent = v.split('\n').length+' lines';
+}
+
+// ── AUTOCORRECT ──
+const corrections = {
+  bonjor:'bonjour',merc:'merci',helo:'hello',keybord:'keyboard',
+  nn:'non',slt:'salut',bjr:'bonjour',mdr:'mort de rire',
+  jvs:'je vais',tfk:"t'as fait quoi",vrmt:'vraiment',pcq:'parce que',
+  jsp:'je sais pas',jpp:'j\'en peux plus',tkt:'t\'inquiète'
+};
+
+
+// ── DICTIONARY (FR + EN enrichi) ──
+const dictionary = [
+  // Français commun
+  'bonjour','bonsoir','salut','merci','beaucoup','s\'il','vous','plaît','désolé','pardon',
+  'comment','ça','va','bien','mal','super','génial','parfait','excellent','formidable',
+  'oui','non','peut-être','jamais','toujours','souvent','parfois','rarement',
+  'je','tu','il','elle','nous','vous','ils','elles','me','te','se','lui','leur',
+  'mon','ton','son','notre','votre','leur','ma','ta','sa',
+  'le','la','les','un','une','des','du','de','au','aux',
+  'est','sont','suis','es','avons','avez','ont','être','avoir',
+  'faire','dire','voir','savoir','pouvoir','vouloir','aller','venir','prendre',
+  'aimer','penser','croire','trouver','donner','partir','arriver','rester','tenir',
+  'très','trop','assez','peu','plus','moins','aussi','encore','déjà','même',
+  'mais','donc','car','parce','puisque','depuis','pendant','après','avant',
+  'avec','sans','pour','dans','sur','sous','entre','chez','vers','par','sous',
+  'maison','voiture','téléphone','ordinateur','clavier','famille','ami','amie',
+  'travail','école','université','ville','pays','monde','vie','temps','jour',
+  'nuit','matin','soir','semaine','mois','année','heure','minute','seconde',
+  'manger','boire','dormir','marcher','courir','parler','lire','écrire',
+  'grand','petit','beau','belle','nouveau','nouvelle','vieux','vieille',
+  'bon','bonne','mauvais','long','court','rapide','lent','fort','faible',
+  'premier','dernier','prochain','autre','même','seul','tout','tous','toute',
+  'bonjour','message','texte','envoyer','recevoir','appeler','répondre',
+  'photo','image','vidéo','musique','film','série','livre','application',
+  'internet','réseau','android','sketchware','clavier','thème','couleur',
+  // Anglais commun
+  'hello','hi','hey','good','morning','evening','night','please','thank','thanks',
+  'you','me','we','they','he','she','it','my','your','his','her','our','their',
+  'the','and','but','because','when','where','what','how','why','who',
+  'yes','no','maybe','never','always','often','sometimes',
+  'can','could','would','should','will','have','has','had','be','been',
+  'go','come','see','know','think','want','need','use','make','get','give','take',
+  'work','play','love','like','enjoy','feel','look','say','tell','ask','find',
+  'house','car','phone','computer','family','friend','school','city','world',
+  'time','day','week','month','year','today','tomorrow','yesterday',
+  'big','small','beautiful','new','old','fast','slow','good','bad','happy','sad',
+  'keyboard','message','send','copy','voice','theme','color','background','sound',
+  'android','mobile','application','design','interface','system','mode','online',
+  'ok','okay','great','nice','cool','awesome','perfect','exactly','absolutely',
+  'sorry','excuse','please','welcome','bye','goodbye','see','later'
+];
+
+function saveWord(text) {
+  if (text.length < 2) return;
+  const words = output.value.split(/\s+/);
+  const last = words[words.length-1];
+  if (last.length > 2 && !savedWords.includes(last)) {
+    savedWords.unshift(last); // recent first
+    try { localStorage.setItem('ali_words', JSON.stringify(savedWords.slice(0,300))); } catch(e) {}
+  }
+}
+
+function showSuggestions() {
+  suggestions.innerHTML = '';
+  const words = output.value.split(/\s/);
+  const current = words[words.length-1].toLowerCase().normalize('NFC');
+  if (current.length < 1) return;
+
+  // Remove accents for fuzzy match
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const normCurrent = norm(current);
+
+  const pool = [...new Set([...savedWords, ...dictionary])];
+
+  // Priority 1: starts with exact current
+  const p1 = pool.filter(w => w.toLowerCase().startsWith(current) && w.toLowerCase() !== current);
+  // Priority 2: normalized starts with (accent-insensitive)
+  const p2 = pool.filter(w => !p1.includes(w) && norm(w).startsWith(normCurrent) && norm(w) !== normCurrent);
+  // Priority 3: contains current
+  const p3 = pool.filter(w => !p1.includes(w) && !p2.includes(w) && norm(w).includes(normCurrent) && norm(w) !== normCurrent);
+
+  const matches = [...p1, ...p2, ...p3].slice(0, 12);
+  matches.forEach(word => {
+    const div = document.createElement('div');
+    div.className = 'sug-item';
+    div.textContent = caps ? word.toUpperCase() : word;
+    div.addEventListener('click', () => {
+      const ws = output.value.split(/\s/);
+      const partial = ws[ws.length-1];
+      ws[ws.length-1] = word;
+      output.value = ws.join(' ') + ' ';
+      output.selectionStart = output.selectionEnd = output.value.length;
+      if (window.AndroidKeyboard) {
+        for (let i=0; i<partial.length; i++) AndroidKeyboard.sendBackspace();
+        AndroidKeyboard.sendText(word + ' ');
+      }
+      suggestions.innerHTML = '';
+      updateStats(); vibrate(15);
+    });
+    suggestions.appendChild(div);
+  });
+}
+
+// ── CURSOR ──
+function moveCursor(dir) {
+  let pos = output.selectionStart;
+  const v = output.value;
+  if (dir==='left') pos=Math.max(0,pos-1);
+  else if (dir==='right') pos=Math.min(v.length,pos+1);
+  else if (dir==='up') {
+    const ls=v.lastIndexOf('\n',pos-1), pls=v.lastIndexOf('\n',ls-1), col=pos-ls-1;
+    pos=Math.min(pls+1+col,ls===-1?pos:ls);
+  }
+  else if (dir==='down') {
+    const le=v.indexOf('\n',pos);
+    if (le===-1) pos=v.length;
+    else { const nle=v.indexOf('\n',le+1), ls=v.lastIndexOf('\n',pos-1), col=pos-ls-1; pos=Math.min(le+1+col,nle===-1?v.length:nle); }
+  }
+  output.selectionStart=output.selectionEnd=pos; output.focus(); vibrate(10);
+}
+
+// ── BUILD ACCENTS ROW ──
+function buildAccentsRow() {
+  accentsRow.innerHTML = '';
+  if (numberMode || emojiMode) return;
+  const arr = caps ? accentsUpper : accentsLower;
+  arr.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'key key-accent';
+    btn.textContent = a;
+    btn.addEventListener('click', function(e) { addRipple(btn,e); insertText(a); vibrate(15); playClick(); });
+    accentsRow.appendChild(btn);
+  });
+}
+
+// ── BUILD KEYBOARD ──
+function buildKeyboard() {
+  keyboard.innerHTML = '';
+  buildAccentsRow();
+
+  if (emojiMode) {
+    for (let i=0; i<emojis.length; i+=10) {
+      const row = document.createElement('div'); row.className='row';
+      emojis.slice(i,i+10).forEach(e => {
+        const btn = makeKey(e, ()=>{ insertText(e); vibrate(15); playClick(); });
+        btn.style.fontSize='20px'; row.appendChild(btn);
+      });
+      keyboard.appendChild(row);
+    }
+  } else if (numberMode) {
+    numbers.forEach(r => {
+      const row = document.createElement('div'); row.className='row';
+      r.forEach(k => { const btn=makeKey(k,()=>{insertText(k);vibrate(18);playClick();}); row.appendChild(btn); });
+      keyboard.appendChild(row);
+    });
+  } else {
+    layouts[layout].forEach(r => {
+      const row = document.createElement('div'); row.className='row';
+      r.forEach(k => {
+        const v = caps?k.toUpperCase():k;
+        const btn=makeKey(v,()=>{insertText(v);vibrate(18);playClick();});
+        row.appendChild(btn);
+      });
+      keyboard.appendChild(row);
+    });
+  }
+
+  // Bottom row
+  const br = document.createElement('div'); br.className='row';
+
+  const shiftBtn = makeKey('⇧',()=>{toggleCaps();vibrate(20);playClick('special');});
+  shiftBtn.className+=' key-special key-shift'; shiftBtn.style.maxWidth='52px';
+  if (caps) shiftBtn.classList.add('active');
+
+  const numBtn = makeKey(numberMode?'ABC':'?123',()=>{toggleNumbers();vibrate(20);playClick('special');});
+  numBtn.className+=' key-special key-num'; numBtn.style.maxWidth='52px'; numBtn.style.fontSize='10px';
+  if (numberMode) numBtn.classList.add('active');
+
+  const spaceBtn = makeKey('· · · · ·',()=>{insertText(' ');vibrate(15);playClick();});
+  spaceBtn.className+=' key-space'; spaceBtn.style.flex='4'; spaceBtn.style.maxWidth='none';
+
+  const emojiBtn = makeKey('😊',()=>{toggleEmoji();vibrate(15);playClick('special');});
+  emojiBtn.className+=' key-emoji'; emojiBtn.style.maxWidth='42px'; emojiBtn.style.fontSize='18px';
+  if (emojiMode) emojiBtn.classList.add('active');
+
+  const enterBtn = makeKey('↵',()=>{insertText('\n');vibrate(20);playClick('special');});
+  enterBtn.className+=' key-enter'; enterBtn.style.maxWidth='50px';
+
+  const delBtn = makeKey('⌫',null); delBtn.className+=' key-delete'; delBtn.style.maxWidth='50px';
+  function startDel() { doBackspace(); vibrate(22); playClick('delete'); holdDeleteTimer=setTimeout(()=>{holdDeleteInterval=setInterval(()=>doBackspace(),45);},380); }
+  function stopDel() { clearTimeout(holdDeleteTimer); clearInterval(holdDeleteInterval); }
+  delBtn.addEventListener('mousedown',startDel); delBtn.addEventListener('touchstart',startDel,{passive:true});
+  delBtn.addEventListener('mouseup',stopDel); delBtn.addEventListener('mouseleave',stopDel); delBtn.addEventListener('touchend',stopDel);
+
+  const sendBtn = makeKey('🚀', ()=>{ sendText(); vibrate(30); playClick('special'); });
+sendBtn.className += ' key-special';
+sendBtn.style.maxWidth = '50px';
+sendBtn.style.background = 'linear-gradient(135deg,#00f5ff,#0080ff)';
+sendBtn.style.color = '#000';
+sendBtn.style.borderColor = '#00f5ff';
+
+br.append(shiftBtn,numBtn,spaceBtn,emojiBtn,delBtn,enterBtn,sendBtn);
+  keyboard.appendChild(br);
+
+  if (rgb) scheduleRGB();
+  updateModeDots();
+}
+
+function makeKey(label, action) {
+  const btn = document.createElement('button'); btn.className='key'; btn.textContent=label;
+  if (action) btn.addEventListener('click', e=>{addRipple(btn,e); action();});
+  return btn;
+}
+
+// ── TOGGLES ──
+function toggleCaps() { caps=!caps; document.getElementById('btnCaps').classList.toggle('active',caps); buildKeyboard(); }
+function toggleLayout() {
+  layout = layout==='qwerty'?'azerty':'qwerty';
+  document.getElementById('btnLayout').textContent = layout==='qwerty'?'🔤 AZERTY':'🔤 QWERTY';
+  showToast('LAYOUT: '+layout.toUpperCase()); buildKeyboard();
+}
+function toggleEmoji() { emojiMode=!emojiMode; if(emojiMode)numberMode=false; document.getElementById('btnEmoji').classList.toggle('active2',emojiMode); buildKeyboard(); }
+function toggleNumbers() { numberMode=!numberMode; if(numberMode)emojiMode=false; document.getElementById('btnNum').classList.toggle('active',numberMode); buildKeyboard(); }
+function updateModeDots() {
+  document.getElementById('dot-alpha').classList.toggle('active',!numberMode&&!emojiMode);
+  document.getElementById('dot-num').classList.toggle('active',numberMode);
+  document.getElementById('dot-emoji').classList.toggle('active2',emojiMode);
+  document.getElementById('modeLabel').textContent = emojiMode?'EMOJI':numberMode?'SYMBOLS':'ALPHA';
+}
+
+// ── RGB (smooth via requestAnimationFrame) ──
+function toggleRGB() {
+  rgb=!rgb;
+  document.getElementById('btnRGB').classList.toggle('active',rgb);
+  if (rgb) { scheduleRGB(); showToast('RGB ON'); }
+  else {
+    if (rgbRaf) { cancelAnimationFrame(rgbRaf); rgbRaf=null; }
+    document.querySelectorAll('.key').forEach(k=>{ k.style.borderColor=''; k.style.boxShadow=''; });
+    showToast('RGB OFF');
+  }
+}
+
+let lastRgbTime = 0;
+function scheduleRGB() {
+  if (rgbRaf) cancelAnimationFrame(rgbRaf);
+  let keys = [];
+  function frame(ts) {
+    if (!rgb) return;
+    if (ts - lastRgbTime > 80) {
+      lastRgbTime = ts;
+      rgbHue = (rgbHue + 2) % 360;
+      if (!keys.length) keys = Array.from(document.querySelectorAll('.key'));
+      keys.forEach((k,i) => {
+        const h = (rgbHue + i*10) % 360;
+        k.style.borderColor = `hsl(${h},100%,55%)`;
+        k.style.boxShadow = `0 0 4px hsl(${h},100%,55%)33`;
+      });
+    }
+    rgbRaf = requestAnimationFrame(frame);
+  }
+  rgbRaf = requestAnimationFrame(frame);
+}
+
+// ── UTILS ──
+function copyText() {
+  if (!output.value) return showToast('RIEN À COPIER');
+  navigator.clipboard.writeText(output.value).then(()=>showToast('📋 COPIÉ!')).catch(()=>{output.select();document.execCommand('copy');showToast('📋 COPIÉ!');});
+  vibrate(30);
+}
+
+function sendText() {
+  if (!output.value.trim()) return showToast('⚠ RIEN À ENVOYER');
+  vibrate(60);
+  const ow = document.querySelector('.output-wrapper');
+  ow.style.boxShadow='0 0 30px #00f5ffaa, 0 0 60px #00f5ff44'; ow.style.borderColor='#00f5ff';
+  setTimeout(()=>{ow.style.boxShadow='';ow.style.borderColor='';},600);
+  if (window.AndroidKeyboard) {
+    try {
+      const pkg = AndroidKeyboard.getPackageName();
+      if (pkg.includes('claude')||pkg.includes('anthropic')) showToast('✅ Appuie sur ➤');
+      else { AndroidKeyboard.performEditorAction(); showToast('🚀 ENVOYÉ!'); }
+    } catch(e) { AndroidKeyboard.performEditorAction(); showToast('🚀 ENVOYÉ!'); }
+    output.value=''; suggestions.innerHTML=''; updateStats();
+  } else {
+    navigator.clipboard.writeText(output.value.trim())
+      .then(()=>{showToast('📋 COPIÉ!');output.value='';suggestions.innerHTML='';updateStats();})
+      .catch(()=>showToast('❌ ERREUR'));
+  }
+}
+
+function clearText() { if (!output.value) return; output.value=''; suggestions.innerHTML=''; updateStats(); showToast('🗑 EFFACÉ'); vibrate(25); }
+
+function removeBg() { document.body.style.backgroundImage=''; document.body.classList.remove('has-bg'); showToast('🚫 FOND RETIRÉ'); }
+
+const translations = {
+  bonjour:'hello',bonsoir:'good evening',merci:'thanks',maison:'house',
+  clavier:'keyboard',ordinateur:'computer',salut:'hi',oui:'yes',non:'no',
+  amour:'love',beau:'beautiful',grand:'big',petit:'small',vite:'fast',
+  lent:'slow',chat:'cat',chien:'dog',voiture:'car',eau:'water',feu:'fire',
+  soleil:'sun',lune:'moon',nuit:'night',jour:'day',ami:'friend',
+  famille:'family',travail:'work',école:'school',manger:'to eat',boire:'to drink',
+  // EN→FR
+  hello:'bonjour',thanks:'merci',house:'maison',car:'voiture',
+  love:'amour',beautiful:'beau',big:'grand',small:'petit',fast:'vite',
+  water:'eau',fire:'feu',sun:'soleil',moon:'lune',night:'nuit',
+  friend:'ami',family:'famille',work:'travail',school:'école'
+};
+function translateWord() {
+  const words = output.value.trim().split(/\s+/);
+  const last = words[words.length-1].toLowerCase();
+  const tr = translations[last];
+  if (tr) { output.value+=` → ${tr}`; showToast(`${last} → ${tr}`); }
+  else showToast('MOT INCONNU');
+  updateStats();
+}
+
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return showToast('MICRO NON SUPPORTÉ');
+  const btn = document.getElementById('btnVoice');
+  if (btn._recognition) {
+    try { btn._recognition.stop(); } catch(e) {}
+    btn._recognition=null; btn.classList.remove('active'); btn.textContent='🎤 VOICE'; return;
+  }
+  const r = new SR(); btn._recognition=r;
+  r.lang='fr-FR'; r.continuous=false; r.interimResults=false; r.maxAlternatives=1;
+  btn.classList.add('active'); btn.textContent='🔴 ÉCOUTE...'; showToast('🎤 PARLEZ...'); vibrate(30);
+  r.onresult=e=>{insertText(e.results[0][0].transcript+' '); showToast('🎤 OK');};
+  r.onend=()=>{btn._recognition=null;btn.classList.remove('active');btn.textContent='🎤 VOICE';};
+  r.onerror=ev=>{
+    btn._recognition=null;btn.classList.remove('active');btn.textContent='🎤 VOICE';
+    if(ev.error==='not-allowed')showToast('❌ MICRO REFUSÉ');
+    else if(ev.error==='no-speech')showToast('⚠ AUCUNE VOIX');
+    else showToast('ERREUR: '+ev.error);
+  };
+  try { r.start(); } catch(e) { btn._recognition=null;btn.classList.remove('active');btn.textContent='🎤 VOICE';showToast('ERREUR MICRO'); }
+}
+
+const aiResponses = {
+  bonjour:'👋 Salut! Je suis ALI KEYBOARD.',
+  merci:'🤖 De rien!',
+  aide:'💡 Tape, traduis, utilise la voix... tout est là!',
+  hello:'🤖 Hello human! ALI KEYBOARD online.',
+  test:'✅ Système opérationnel.',
+  cool:'🔥 Merci! Développé avec ❤️',
+  help:'💡 Swipe left or tap ☰ for options!',
+};
+function fakeAI() {
+  const text = output.value.trim().toLowerCase();
+  let response = '🤖 ALI KEYBOARD — Système actif!';
+  for (const [k,v] of Object.entries(aiResponses)) { if (text.includes(k)){response=v;break;} }
+  output.value+='\n'+response+'\n'; output.scrollTop=output.scrollHeight; updateStats(); showToast('🤖 IA RÉPOND...'); vibrate(40);
+}
+
+// ── TOAST ──
+let toastTimer=null;
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+// ── BG UPLOAD (FIXED) ──
+document.getElementById('bgUpload').addEventListener('change', function(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    document.body.style.cssText += `background-image:url(${ev.target.result}) !important;background-size:cover !important;background-position:center !important;background-attachment:fixed !important;`;
+    document.body.classList.add('has-bg');
+    showToast('🖼 FOND APPLIQUÉ');
+    closePanel();
+  };
+  reader.readAsDataURL(file);
+  // Reset so same file can be re-selected
+  this.value = '';
+});
+
+// ── KEYBOARD SHORTCUTS ──
+document.addEventListener('keydown', e=>{
+  if (e.target===output) return;
+  if (e.ctrlKey&&e.key==='c') copyText();
+  if (e.ctrlKey&&e.key==='Delete') clearText();
+});
+
+output.addEventListener('input', ()=>{showSuggestions();updateStats();});
+output.addEventListener('keyup', showSuggestions);
+
+// ── INIT ──
+try {
+  const saved = localStorage.getItem('ali_theme');
+  if (saved && themes[saved]) applyTheme(saved);
+  else applyTheme('cyber');
+} catch(e) { applyTheme('cyber'); }
+
+buildKeyboard();
+updateStats();
+
+const statuses=['● ONLINE','● READY','● ALI v4.0','● FR/EN'];
+let si=0;
+setInterval(()=>{ document.getElementById('statusLabel').textContent=statuses[si%statuses.length]; si++; },3000);
+</script>
+<script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+</script>
+</body>
+</html>
