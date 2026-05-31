@@ -86,18 +86,7 @@ const dictionaryFR = [
 "semaine",
 "mois",
 "année",
-"janvier",
-"février",
-"mars",
-"avril",
-"mai",
-"juin",
-"juillet",
-"août",
-"septembre",
-"octobre",
-"novembre",
-"décembre"
+
 
 "bonjour","bonsoir","salut","merci","amour","ami","amie",
 "famille","maison","école","université","travail","entreprise",
