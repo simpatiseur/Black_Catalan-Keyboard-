@@ -575,6 +575,7 @@ scroll-behavior:smooth;
 <div id="toast"></div>
   
 <script src="dictionary-fr.js"></script>
+<script src="dictionary-en.js"></script>
 <script>
 // ── STATE ──
 const output = document.getElementById('output');
@@ -756,7 +757,8 @@ const corrections = {
 
 // ── DICTIONARY (FR + EN enrichi) ──
 const dictionary = [
-  ...dictionaryFR
+    ...dictionaryFR,
+    ...dictionaryEN
 ];
 
 
