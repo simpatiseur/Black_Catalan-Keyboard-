@@ -1140,11 +1140,12 @@ document.addEventListener('keydown', e=>{
 });
 
 output.addEventListener('input', () => {
-  const words = output.value.trim().split(/\s+/);
-  const lastWord = words[words.length - 1];
-
-  if (lastWord && lastWord.length > 2) {
-    learnWord(lastWord);
+  const words = output.value.split(/\s+/);
+  if (words.length >= 2) {
+    const prevWord = words[words.length - 2];
+    if (prevWord && prevWord.length > 2) {
+      learnWord(prevWord);
+    }
   }
 
   autoCorrectLastWord();
