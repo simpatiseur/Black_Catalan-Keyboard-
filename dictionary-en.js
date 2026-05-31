@@ -1,0 +1,19 @@
+const dictionaryEN = [
+"hello",
+"hi",
+"good",
+"great",
+"thanks",
+"please",
+"computer",
+"keyboard",
+"phone",
+"application",
+"message",
+"internet",
+"school",
+"family",
+"friend",
+"house",
+"work"
+];
