@@ -1141,14 +1141,17 @@ document.addEventListener('keydown', e=>{
 
 output.addEventListener('input', () => {
   const words = output.value.split(/\s+/);
-  // Le mot PRÉCÉDENT (avant le dernier) = mot terminé par un espace
   if (words.length >= 2) {
     const prevWord = words[words.length - 2];
     if (prevWord && prevWord.length > 2) {
       learnWord(prevWord);
     }
   }
-  ...
+
+  autoCorrectLastWord();
+  showSuggestions();
+  updateStats();
+});
 
   autoCorrectLastWord();
   showSuggestions();
