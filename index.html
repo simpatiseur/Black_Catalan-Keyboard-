@@ -760,13 +760,35 @@ const dictionary = [
     ...dictionaryFR,
     ...dictionaryEN
 ];
+  let learnedWords = JSON.parse(
+    localStorage.getItem('learnedWords') || '[]'
+);
+  function learnWord(word){
+
+    word = word.trim().toLowerCase();
+
+    if(word.length < 3) return;
+
+    if(!learnedWords.includes(word)){
+
+        learnedWords.push(word);
+
+        localStorage.setItem(
+            'learnedWords',
+            JSON.stringify(learnedWords)
+        );
+    }
+  }
 
 
 function saveWord(text) {
   if (text.length < 2) return;
   const words = output.value.split(/\s+/);
   const last = words[words.length-1];
-  if (last.length > 2 && !savedWords.includes(last)) {
+  if (last.length > 2) {
+    savedWords = savedWords.filter(
+  word => word.toLowerCase() !== last.toLowerCase()
+);
     savedWords.unshift(last); // recent first
     try { localStorage.setItem('ali_words', JSON.stringify(savedWords.slice(0,300))); } catch(e) {}
   }
