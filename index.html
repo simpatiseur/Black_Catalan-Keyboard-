@@ -327,6 +327,141 @@ body.has-bg .options-panel { background: rgba(13,17,23,0.93); backdrop-filter: b
 /* ── RESPONSIVE ── */
 @media (max-width: 380px) { .key { height: 36px; font-size: 16px; } .row { gap: 2px; } }
 @media (min-width: 600px) { .key { height: 44px; font-size: 19px; } .row { gap: 5px; } }
+  /* ===== ULTRA SMOOTH PATCH ===== */
+
+.key{
+transition:
+transform .18s cubic-bezier(.22,1,.36,1),
+box-shadow .25s ease,
+border-color .25s ease,
+background .25s ease,
+color .25s ease !important;
+}
+
+.key:hover{
+transform:translateY(-1px);
+}
+
+.key:active,
+.key.pressed{
+transform:scale(.90) translateY(2px);
+}
+
+.sug-item{
+transition:
+transform .18s ease,
+background .25s ease,
+color .25s ease,
+box-shadow .25s ease;
+}
+
+.sug-item:hover{
+transform:translateY(-2px);
+}
+
+.sug-item:active{
+transform:scale(.95);
+}
+
+.output-wrapper,
+.keyboard-container{
+transition:
+transform .35s ease,
+box-shadow .35s ease,
+background .35s ease,
+border-color .35s ease;
+}
+
+.output-wrapper:focus-within{
+transform:translateY(-2px);
+box-shadow:0 10px 30px rgba(0,245,255,.12);
+}
+
+.panel-btn{
+transition:
+transform .18s ease,
+background .25s ease,
+border-color .25s ease,
+color .25s ease,
+box-shadow .25s ease;
+}
+
+.panel-btn:hover{
+transform:translateY(-2px);
+}
+
+.panel-btn:active{
+transform:scale(.95);
+}
+
+.menu-btn{
+transition:
+transform .2s ease,
+box-shadow .25s ease,
+border-color .25s ease;
+}
+
+.menu-btn:hover{
+transform:rotate(8deg);
+}
+
+.options-panel{
+transition:
+right .45s cubic-bezier(.22,1,.36,1);
+}
+
+.panel-overlay{
+transition:
+background .35s ease;
+}
+
+.logo{
+animation:logoFloat 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat{
+0%{transform:translateY(0);}
+50%{transform:translateY(-2px);}
+100%{transform:translateY(0);}
+}
+
+.accents-row .key{
+animation:fadeAccent .3s ease;
+}
+
+@keyframes fadeAccent{
+from{
+opacity:0;
+transform:translateY(8px);
+}
+to{
+opacity:1;
+transform:none;
+}
+}
+
+.keyboard{
+animation:keyboardAppear .25s ease;
+}
+
+@keyframes keyboardAppear{
+from{
+opacity:.85;
+transform:translateY(5px);
+}
+to{
+opacity:1;
+transform:none;
+}
+}
+
+#toast{
+backdrop-filter:blur(10px);
+}
+
+body{
+scroll-behavior:smooth;
+             }
 </style>
 </head>
 <body>
