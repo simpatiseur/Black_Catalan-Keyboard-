@@ -573,7 +573,8 @@ scroll-behavior:smooth;
 </div>
 
 <div id="toast"></div>
-
+  
+<script src="dictionary-fr.js"></script>
 <script>
 // ── STATE ──
 const output = document.getElementById('output');
@@ -793,7 +794,10 @@ const dictionary = [
   'android','mobile','application','design','interface','system','mode','online',
   'ok','okay','great','nice','cool','awesome','perfect','exactly','absolutely',
   'sorry','excuse','please','welcome','bye','goodbye','see','later'
+
+    ...dictionaryFR
 ];
+
 
 function saveWord(text) {
   if (text.length < 2) return;
