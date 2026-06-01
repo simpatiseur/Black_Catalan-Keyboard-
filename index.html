@@ -1922,41 +1922,16 @@ function copyText() {
   navigator.clipboard.writeText(output.value).then(()=>showToast('📋 COPIÉ!')).catch(()=>{output.select();document.execCommand('copy');showToast('📋 COPIÉ!');});
   vibrate(30);
 }
-
 function sendText() {
   const txt = output.value.trim();
-  if (!txt) return showToast('⚠ RIEN À ENVOYER');
 
-  vibrate(60);
+  alert("Texte = " + txt);
 
-  try {
-    if (window.AndroidKeyboard) {
-      if (typeof AndroidKeyboard.sendText === 'function') {
-        AndroidKeyboard.sendText(txt);
-      }
-
-      if (typeof AndroidKeyboard.sendKey === 'function') {
-        AndroidKeyboard.sendKey(66);
-      } else if (typeof AndroidKeyboard.sendEnter === 'function') {
-        AndroidKeyboard.sendEnter();
-      }
-
-      showToast('🚀 ENVOYÉ !');
-    } else if (navigator.share) {
-      navigator.share({text: txt}).catch(()=>{});
-      showToast('🚀 PARTAGÉ !');
-    } else {
-      navigator.clipboard.writeText(txt);
-      showToast('📋 COPIÉ !');
-    }
-
-    output.value='';
-    suggestions.innerHTML='';
-    updateStats();
-
-  } catch(e) {
-    console.error(e);
-    showToast('❌ ERREUR ENVOI');
+  if (window.AndroidKeyboard) {
+    AndroidKeyboard.sendText(txt);
+    alert("sendText exécuté");
+  } else {
+    alert("AndroidKeyboard introuvable");
   }
 }
 
