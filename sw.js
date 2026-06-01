@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ali-keyboard-v5';
+const CACHE_NAME = 'ali-keyboard-v6';
 const FILES = [
   '/',
   '/index.html',
